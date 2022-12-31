@@ -6,6 +6,7 @@ Welcome to this tool useful to avoid boiler plate code in your React Native expe
 
 To install and use it from your machine make sure to have `yeoman` installed: `npm i -g yo` <br />
 After installing yeoman, perform the following operations: <br /> <br />
+`npm install` <br />
 `npm run build` <br />
 `npm link` <br />
 `yo --generators` <br />

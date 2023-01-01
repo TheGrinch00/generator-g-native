@@ -10,9 +10,9 @@ module.exports = class extends Generator {
         this.log(
             yosay(
                 `Hi! Welcome to the official ${chalk.blue(
-                    "Getapper ReactNative Generator!"
+                    "Getapper React Native Generator!"
                 )}. ${chalk.red(
-                    "This command SHOULD only be executed right after CRA install, not sooner, not later!"
+                    "This command SHOULD only be executed right after CEA install, not sooner, not later!"
                 )}\nAnd it will install Redux, Sagas, Persist, and basic app templates.`
             )
         );

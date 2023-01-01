@@ -5,7 +5,7 @@ import { View } from "react-native";
 <% } %>type <%= componentName %>Props = {}
 
 export const <%= componentName %> = memo(({}: <%= componentName %>Props) => {
-<% if (useHooks) { %>  const {} = use<%= componentName %>();
+<% if (useHooks) { %>  const {<% if (useStyles) { %> styles <% } %>} = use<%= componentName %>();
 
 <% } %>  return (<View></View>);
 });

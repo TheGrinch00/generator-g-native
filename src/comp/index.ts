@@ -13,7 +13,7 @@ module.exports = class extends Generator {
         this.log(
             yosay(
                 `Welcome to ${chalk.red(
-                    "generator-g-react"
+                    "generator-g-native"
                 )} component generator, follow the quick and easy configuration to create a new component!`
             )
         );
@@ -28,6 +28,12 @@ module.exports = class extends Generator {
                 type: "confirm",
                 name: "useHooks",
                 message: "Would you like to create a separate hook file?",
+                default: true
+            },
+            {
+                type: "confirm",
+                name: "useStyles",
+                message: "Would you like to create a separate stylesheet file?",
                 default: true
             }
         ]);
@@ -72,6 +78,15 @@ module.exports = class extends Generator {
                 {
                     ...this.answers
                 }
+            );
+        }
+
+        if (this.answers.useStyles) {
+            this.fs.copyTpl(
+                this.templatePath("styles.ts"),
+                this.destinationPath(
+                    `./src/components/${this.answers.componentName}/styles.ts`
+                ),
             );
         }
 

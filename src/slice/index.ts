@@ -11,7 +11,7 @@ module.exports = class extends Generator {
     this.log(
       yosay(
         `Welcome to ${chalk.red(
-          "generator-g-react"
+          "generator-g-native"
         )} redux slice generator, follow the quick and easy configuration to create a new slice!`
       )
     );

@@ -24,3 +24,7 @@ Creates the React Native app inside the specified folder using it as its name an
 ## :init
 
 Adds useful files and folders, adds dependencies and installs them
+
+## :comp
+
+Creates a new component inside the `src/components` folder

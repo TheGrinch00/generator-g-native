@@ -6,12 +6,12 @@ type <%= formName %>Props = {}
 
 export const <%= formName %> = memo(({}: <%= formName %>Props) => {
   const {
-    formData,
+    formMethods,
     onSubmit,
   } = use<%= formName %>();
 
   return (
-    <FormProvider {...formData}>
+    <FormProvider {...formMethods}>
       <form onSubmit={onSubmit}></form>
     </FormProvider>
   );

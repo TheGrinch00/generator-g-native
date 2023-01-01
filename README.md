@@ -1,24 +1,26 @@
-Minimal example of a [yeoman](https://yeoman.io/) generator written in typescript.
-It is intended to be used as a template for new generators.
+# React Native CLI Tool Generator
 
-See https://github.com/yeoman/yeoman/issues/1734 for some background.
+Welcome to this tool useful to avoid boiler plate code in your React Native experience created using Node 18. This tool will set you up with a project scaffolding in typescript, a basic navigation (using the `tabs` template) and some useful setup for AJAX calls, redux toolkit and form utilities.
 
-**Getting started** 
-```bash
-npm install -g yo
-git clone https://github.com/gliviu/generator-typescript-template
-cd generator-typescript-template
-npm install
-npm run build
+## Installation
 
-# Link the package to global scope so that yeoman discovers the new generator
-npm link
+To install and use it from your machine make sure to have `yeoman` installed: `npm i -g yo` <br />
+After installing yeoman, perform the following operations: <br /> <br />
+`npm install` <br />
+`npm run build` <br />
+`npm link` <br />
+`yo --generators` <br />
 
-yo --generators # check the generator is in place
+And you should see the generator popping up in the list.  <br />
 
-yo typescript-template argument1 --option2 secondOption
+# Commands
 
-# Check that ./dummyfile.txt was created according to above CLI arguments
+This is a list of the available commands:
 
-npm run watch    # build generator as development goes
-```
+## :app
+
+Creates the React Native app inside the specified folder using it as its name and uses the `tabs` typescript template
+
+## :init
+
+Adds useful files and folders, adds dependencies and installs them

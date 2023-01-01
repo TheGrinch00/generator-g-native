@@ -16,4 +16,7 @@ export const selectors = {
   ...ajax.selectors,
 };
 
-export const sagas = [...Object.values(ui.sagas), ...Object.values(ajax.sagas)];
+export const sagas = [
+  ...Object.values(ui.sagas),
+  ...Object.values(ajax.sagas),
+];

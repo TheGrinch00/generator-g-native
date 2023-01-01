@@ -4,11 +4,9 @@ Welcome to this tool useful to avoid boiler plate code in your React Native expe
 
 ## Installation
 
-To install and use it from your machine make sure to have `yeoman` installed: `npm i -g yo` <br />
-After installing yeoman, perform the following operations: <br /> <br />
-`npm install` <br />
-`npm run build` <br />
-`npm link` <br />
+To install and use it from your machine make sure to have `yeoman` installed: <br /> `npm i -g yo` <br /> <br />
+After installing yeoman, run the following command: <br />
+
 `yo --generators` <br />
 
 And you should see the generator popping up in the list.  <br />
@@ -28,3 +26,7 @@ Adds useful files and folders, adds dependencies and installs them
 ## :comp
 
 Creates a new component inside the `src/components` folder
+
+## :slice
+
+Creates a new redux slice inside the `src/redux-store` folder with all the boilerplate code already in place and ready to use

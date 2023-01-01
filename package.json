@@ -1,10 +1,8 @@
 {
-  "name": "generator-g-native",
+  "name": "@thegrinch00/generator-g-native",
   "version": "0.1.0",
   "description": "Generator to improve DX in React Native projects",
-  "author": {
-    "name": "TheGrinch00"
-  },
+  "author": "TheGrinch00",
   "files": [
     "generators"
   ],
@@ -16,7 +14,8 @@
     "clean": "rimraf -rf ./generators",
     "watch": "npm run watch-tsc --silent & npm run watch-deps --silent",
     "watch-deps": "onchange 'src/*/templates/**' --initial -- npm run copydeps --silent",
-    "watch-tsc": "tsc-watch --onSuccess 'npm run lint --silent'"
+    "watch-tsc": "tsc-watch --onSuccess 'npm run lint --silent'",
+    "prepare": "npm run build --silent"
   },
   "dependencies": {
     "chalk": "4.1.2",
@@ -39,5 +38,19 @@
     "typescript": "4.9.4",
     "yeoman-assert": "3.1.1",
     "yeoman-test": "7.1.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TheGrinch00/generator-g-native.git"
+  },
+  "keywords": [
+    "generator",
+    "react",
+    "react-native"
+  ],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TheGrinch00/generator-g-native/issues"
+  },
+  "homepage": "https://github.com/TheGrinch00/generator-g-native#readme"
 }

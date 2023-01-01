@@ -19,8 +19,9 @@
     "watch-tsc": "tsc-watch --onSuccess 'npm run lint --silent'"
   },
   "dependencies": {
-    "yeoman-generator": "5.7.0",
     "chalk": "4.1.2",
+    "pascal-case": "^3.1.2",
+    "yeoman-generator": "5.7.0",
     "yosay": "2.0.2"
   },
   "devDependencies": {

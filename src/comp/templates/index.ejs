@@ -1,0 +1,13 @@
+import React, { memo } from "react";
+import { View } from "react-native";
+<% if (useHooks) { %>import { use<%= componentName %> } from "./index.hooks";
+
+<% } %>type <%= componentName %>Props = {}
+
+export const <%= componentName %> = memo(({}: <%= componentName %>Props) => {
+<% if (useHooks) { %>  const {} = use<%= componentName %>();
+
+<% } %>  return (<View></View>);
+});
+
+<%= componentName %>.displayName = "<%= componentName %>";

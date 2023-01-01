@@ -15,18 +15,22 @@ And you should see the generator popping up in the list.  <br />
 
 This is a list of the available commands:
 
-## :app
+## yo g-native:app
 
 Creates the React Native app inside the specified folder using it as its name and uses the `tabs` typescript template
 
-## :init
+## yo g-native:init
 
 Adds useful files and folders, adds dependencies and installs them
 
-## :comp
+## yo g-native:comp
 
 Creates a new component inside the `src/components` folder
 
-## :slice
+## yo g-native:slice
 
 Creates a new redux slice inside the `src/redux-store` folder with all the boilerplate code already in place and ready to use
+
+## yo g-native:ajax
+
+Creates a redux action that will trigger an AJAX call to the specified endpoint

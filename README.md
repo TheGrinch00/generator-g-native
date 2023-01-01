@@ -34,3 +34,7 @@ Creates a new redux slice inside the `src/redux-store` folder with all the boile
 ## yo g-native:ajax
 
 Creates a redux action that will trigger an AJAX call to the specified endpoint
+
+## yo g-native:form
+
+Creates a new Component with all boilerplate code to create a form with `react-hook-form` and validations via `yup`

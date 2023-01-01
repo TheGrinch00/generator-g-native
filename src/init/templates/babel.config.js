@@ -11,6 +11,7 @@ module.exports = function (api) {
                         config: "./src/config",
                         constants: "./src/constants",
                         hooks: "./src/hooks",
+                        models: "./src/models",
                         navigation: "./src/navigation",
                         "redux-store": "./src/redux-store",
                         screens: "./src/screens",

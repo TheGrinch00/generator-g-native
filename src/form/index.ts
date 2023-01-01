@@ -7,7 +7,10 @@ import path = require("path");
 import PascalCase = require("pascal-case");
 
 module.exports = class extends Generator {
-  answers: any;
+  answers: {
+    formName: string;
+  };
+
   async prompting() {
     // Have Yeoman greet the user.
     this.log(
@@ -22,8 +25,8 @@ module.exports = class extends Generator {
       {
         type: "input",
         name: "formName",
-        message: "What is your form name?"
-      }
+        message: "What is your form name?",
+      },
     ]);
 
     if (answers.formName === "") {
@@ -47,7 +50,7 @@ module.exports = class extends Generator {
         `./src/components/${this.answers.formName}/index.tsx`
       ),
       {
-        ...this.answers
+        ...this.answers,
       }
     );
 
@@ -61,7 +64,7 @@ module.exports = class extends Generator {
         `./src/components/${this.answers.formName}/index.hooks.tsx`
       ),
       {
-        ...this.answers
+        ...this.answers,
       }
     );
 

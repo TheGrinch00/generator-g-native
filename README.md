@@ -38,3 +38,7 @@ Creates a redux action that will trigger an AJAX call to the specified endpoint
 ## yo g-native:form
 
 Creates a new Component with all boilerplate code to create a form with `react-hook-form` and validations via `yup`
+
+## yo g-native:model
+
+Creates a new TypeScript class representing a data model inside the `src/models` folder

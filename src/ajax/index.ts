@@ -7,16 +7,16 @@ import getTemplate from "./templates/api";
 import fs = require("fs");
 import path = require("path");
 
-const camelCaseToDash = s =>
+const camelCaseToDash = (s) =>
   s.replace(/([a-zA-Z])(?=[A-Z])/g, "$1-").toLowerCase();
 
-const capitalize = s => `${s[0].toUpperCase()}${s.slice(1)}`;
+const capitalize = (s) => `${s[0].toUpperCase()}${s.slice(1)}`;
 
-const parseFromText = text => {
+const parseFromText = (text) => {
   const params = text
     .split("/")
-    .filter(p => p !== "")
-    .map(p => {
+    .filter((p) => p !== "")
+    .map((p) => {
       if (p[0] === "{") {
         return "{" + camelCaseToDash(p.replace("{", "").replace("}", "")) + "}";
       }
@@ -28,21 +28,21 @@ const parseFromText = text => {
 
 const getFunctionName = (method, params) => {
   const models = params
-    .filter(p => p[0] !== "{")
-    .map(p =>
+    .filter((p) => p[0] !== "{")
+    .map((p) =>
       p
         .split("-")
-        .map(p => capitalize(p))
+        .map((p) => capitalize(p))
         .join("")
     );
   const variables = params
-    .filter(p => p[0] === "{")
-    .map(p =>
+    .filter((p) => p[0] === "{")
+    .map((p) =>
       p
         .replace("{", "")
         .replace("}", "")
         .split("-")
-        .map(p => capitalize(p))
+        .map((p) => capitalize(p))
         .join("")
     );
   return `${method}${models.join("")}${
@@ -51,10 +51,10 @@ const getFunctionName = (method, params) => {
 };
 
 const getAjaxFolder = (method, params) => {
-  const models = params.filter(p => p[0] !== "{");
+  const models = params.filter((p) => p[0] !== "{");
   const variables = params
-    .filter(p => p[0] === "{")
-    .map(p => p.replace("{", "").replace("}", ""));
+    .filter((p) => p[0] === "{")
+    .map((p) => p.replace("{", "").replace("}", ""));
   return `${method}-${models.join("-")}${
     variables.length ? "-by-" : ""
   }${variables.join("-and-")}`;
@@ -64,7 +64,7 @@ const getAjaxActionRoute = (method, params) => {
   return (
     "apis/" +
     params
-      .map(p => {
+      .map((p) => {
         if (p[0] === "{") {
           return `{${p
             .replace("{", "")
@@ -82,10 +82,10 @@ const getAjaxActionRoute = (method, params) => {
   );
 };
 
-const getAjaxPath = params => {
+const getAjaxPath = (params) => {
   const urlParams = params
-    .filter(p => p[0] === "{")
-    .map(p =>
+    .filter((p) => p[0] === "{")
+    .map((p) =>
       p
         .replace("{", "")
         .replace("}", "")
@@ -96,7 +96,7 @@ const getAjaxPath = params => {
   if (urlParams.length) {
     return [
       `\`/${params
-        .map(p => {
+        .map((p) => {
           if (p[0] === "{") {
             return `\${params.${p
               .replace("{", "")
@@ -109,7 +109,7 @@ const getAjaxPath = params => {
           return p;
         })
         .join("/")}\``,
-      urlParams
+      urlParams,
     ];
   }
 
@@ -117,7 +117,11 @@ const getAjaxPath = params => {
 };
 
 module.exports = class extends Generator {
-  answers: any;
+  answers: {
+    route: string;
+    method: string;
+  };
+
   async prompting() {
     // Have Yeoman greet the user.
     this.log(
@@ -132,15 +136,15 @@ module.exports = class extends Generator {
       {
         type: "input",
         name: "route",
-        message: "What is your API route?"
+        message: "What is your API route?",
       },
       {
         type: "list",
         name: "method",
         message: "What is your API http method?",
         choices: ["get", "post", "patch", "put", "delete"],
-        default: "get"
-      }
+        default: "get",
+      },
     ]);
 
     if (answers.route === "") {

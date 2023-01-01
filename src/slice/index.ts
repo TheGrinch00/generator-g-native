@@ -5,7 +5,10 @@ import yosay = require("yosay");
 import PascalCase = require("pascal-case");
 
 module.exports = class extends Generator {
-  answers: any;
+  answers: {
+    sliceName: string;
+    useSagas: boolean;
+  };
 
   async prompting() {
     this.log(

@@ -17,7 +17,7 @@ This is a list of the available commands:
 
 ## yo g-native:app
 
-Creates the React Native app inside the specified folder using it as its name and uses the `tabs` typescript template
+Creates the React Native app and uses the `tabs` typescript template
 
 ## yo g-native:init
 

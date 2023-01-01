@@ -51,7 +51,7 @@ module.exports = class extends Generator {
                 redux: "^4.2.0",
                 "redux-persist": "6.0.0",
                 "redux-saga": "1.1.3",
-                yup: "0.32.9"
+                yup: "0.32.11"
             },
             husky: {
                 hooks: {

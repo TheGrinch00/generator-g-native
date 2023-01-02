@@ -1,12 +1,13 @@
 # React Native CLI Tool Generator
 
-Welcome to this tool useful to avoid boiler plate code in your React Native experience created using Node 18. This tool will set you up with a project scaffolding in typescript, a basic navigation (using the `tabs` template) and some useful setup for AJAX calls, redux toolkit and form utilities.
+Welcome to this tool useful to avoid boilerplate code in your React Native experience created using Node 18. This tool will set you up with a project scaffolding in typescript, a basic navigation (using the `tabs` template) and some useful setup for AJAX calls, redux toolkit and form utilities.
 
 ## Installation
 
 To install and use it from your machine make sure to have `yeoman` installed: <br /> `npm i -g yo` <br /> <br />
 After installing yeoman, run the following command: <br />
 
+`npm i -g generator-g-native` <br />
 `yo --generators` <br />
 
 And you should see the generator popping up in the list.  <br />

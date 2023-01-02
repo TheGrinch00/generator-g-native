@@ -1,6 +1,6 @@
 {
   "name": "generator-g-native",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Generator to improve DX in React Native projects",
   "author": "TheGrinch00",
   "files": [

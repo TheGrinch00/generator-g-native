@@ -1,0 +1,5 @@
+<% if (useStyles) { %>import { styles } from "./styles"; <% } %>
+
+export const use<%= sceneName %> = () => {
+  return {<% if(useStyles){ %> styles <% } %>};
+};

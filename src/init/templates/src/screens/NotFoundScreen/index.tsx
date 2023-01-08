@@ -6,7 +6,7 @@ import { useNotFoundScreen } from "./index.hooks";
 import { styles } from "./styles";
 
 import { RootStackScreenProps } from "../../../types";
-import { Text, View } from "components/Themed";
+import { Text, View } from "components";
 
 type NotFoundScreenProps = {} & RootStackScreenProps<"NotFound">;
 

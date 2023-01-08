@@ -11,7 +11,7 @@ module.exports = class extends Generator {
     sceneName: string;
     useHooks: boolean;
     useStyles: boolean;
-  }
+  };
   async prompting() {
     // Have Yeoman greet the user.
     this.log(
@@ -26,20 +26,20 @@ module.exports = class extends Generator {
       {
         type: "input",
         name: "sceneName",
-        message: "What is your screen name?"
+        message: "What is your screen name?",
       },
       {
         type: "confirm",
         name: "useHooks",
         message: "Would you like to create a separate hook file?",
-        default: true
+        default: true,
       },
       {
         type: "confirm",
         name: "useStyles",
         message: "Would you like to create a separate style file?",
-        default: true
-      }
+        default: true,
+      },
     ]);
 
     if (this.answers.sceneName === "") {
@@ -60,7 +60,7 @@ module.exports = class extends Generator {
       this.templatePath("index.ejs"),
       this.destinationPath(`./src/screens/${this.answers.sceneName}/index.tsx`),
       {
-        ...this.answers
+        ...this.answers,
       }
     );
 
@@ -75,7 +75,7 @@ module.exports = class extends Generator {
           `./src/screens/${this.answers.sceneName}/index.hooks.tsx`
         ),
         {
-          ...this.answers
+          ...this.answers,
         }
       );
     }
@@ -85,22 +85,22 @@ module.exports = class extends Generator {
      */
 
     if (this.answers.useStyles) {
-        this.fs.copyTpl(
-            this.templatePath("styles.ts"),
-            this.destinationPath(
-            `./src/screens/${this.answers.sceneName}/styles.ts`
-            ),
-            {
-            ...this.answers
-            }
-        );
+      this.fs.copyTpl(
+        this.templatePath("styles.ts"),
+        this.destinationPath(
+          `./src/screens/${this.answers.sceneName}/styles.ts`
+        ),
+        {
+          ...this.answers,
+        }
+      );
     }
 
     /**
      * /src/screens/index.tsx export file
      */
 
-    const content = `export * from './${this.answers.sceneName}';\n`;
+    const content = `export * from "./${this.answers.sceneName}";\n`;
 
     fs.appendFileSync(
       path.join(this.destinationRoot(), "src", "screens", "index.tsx"),

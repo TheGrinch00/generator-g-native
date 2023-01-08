@@ -4,8 +4,8 @@ import { RootTabScreenProps } from "../../../types";
 import { useTabOneScreen } from "./index.hooks";
 import { styles } from "./styles";
 
-import EditScreenInfo from "components/EditScreenInfo";
-import { Text, View } from "components/Themed";
+import { EditScreenInfo } from "components";
+import { Text, View } from "components";
 
 type TabOneScreenProps = {} & RootTabScreenProps<"TabOne">;
 

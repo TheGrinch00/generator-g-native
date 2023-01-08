@@ -4,8 +4,9 @@ import { StatusBar } from "expo-status-bar";
 
 import { useModalScreen } from "./index.hooks";
 
-import { Text, View } from "components/Themed";
-import EditScreenInfo from "components/EditScreenInfo";
+import { Text, View } from "components";
+
+import { EditScreenInfo } from "components";
 
 type ModalScreenProps = {};
 

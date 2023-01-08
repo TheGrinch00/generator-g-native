@@ -1,7 +1,7 @@
 import { FC, memo } from "react";
 
-import { Text, View } from "components/Themed";
-import EditScreenInfo from "components/EditScreenInfo";
+import { Text, View } from "components";
+import { EditScreenInfo } from "components";
 
 import { useTabTwoScreen } from "./index.hooks";
 import { styles } from "./styles";

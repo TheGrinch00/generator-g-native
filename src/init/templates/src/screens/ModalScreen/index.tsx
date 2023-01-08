@@ -1,11 +1,15 @@
-import { Text, View } from "../../components/Themed";
-import EditScreenInfo from "../../components/EditScreenInfo";
-import { StatusBar } from "expo-status-bar";
+import { FC, memo } from "react";
 import { Platform } from "react-native";
-import { memo } from "react";
+import { StatusBar } from "expo-status-bar";
+
 import { useModalScreen } from "./index.hooks";
 
-export const ModalScreen = memo(() => {
+import { Text, View } from "components/Themed";
+import EditScreenInfo from "components/EditScreenInfo";
+
+type ModalScreenProps = {};
+
+export const ModalScreen: FC<ModalScreenProps> = memo(() => {
   const { styles } = useModalScreen();
 
   return (

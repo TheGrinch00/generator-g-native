@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import * as selectors from "./ui.selectors";
-import { DialogTypes, SetDialogOpenAction, UiState } from "./ui.interfaces";
+import { SetDialogOpenAction, UiState } from "./ui.interfaces";
 import * as extraActions from "../../extra-actions";
 import * as sagas from "./ui.sagas";
 

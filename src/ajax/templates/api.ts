@@ -1,4 +1,10 @@
-export default (apiNamePC, apiActionRoute, routePath, methodUC, urlParams) => `import {
+export default (
+  apiNamePC,
+  apiActionRoute,
+  routePath,
+  methodUC,
+  urlParams
+) => `import {
   apiActionBuilder,
   apiRequestPayloadBuilder,
   ApiRequestPayloadBuilderOptions,
@@ -7,7 +13,9 @@ export default (apiNamePC, apiActionRoute, routePath, methodUC, urlParams) => `i
   HttpMethod
 } from '../api-builder'
 
-export interface ${apiNamePC}Params {${urlParams ? urlParams.map(p => `\n  ${p}: string,`).join('\n') + '\n' : ''}}
+export interface ${apiNamePC}Params {${
+  urlParams ? urlParams.map((p) => `\n  ${p}: string,`).join("\n") + "\n" : ""
+}}
 export interface ${apiNamePC}ResponseData {}
 export default apiActionBuilder<
   ${apiNamePC}Params,
@@ -29,4 +37,4 @@ export default apiActionBuilder<
     ),
   })
 );
-`
+`;

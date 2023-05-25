@@ -52,7 +52,7 @@ module.exports = class extends Generator {
 
     this.fs.copyTpl(
       this.templatePath("index.ejs"),
-      this.destinationPath(`./src/redux-store/slices/${sliceName}/index.ts`),
+      this.destinationPath(`./redux-store/slices/${sliceName}/index.ts`),
       {
         sliceName,
         pCsliceName,
@@ -67,7 +67,7 @@ module.exports = class extends Generator {
     this.fs.copyTpl(
       this.templatePath("interface.index.ejs"),
       this.destinationPath(
-        `./src/redux-store/slices/${sliceName}/${sliceName}.interfaces.ts`
+        `./redux-store/slices/${sliceName}/${sliceName}.interfaces.ts`
       ),
       {
         pCsliceName,
@@ -81,7 +81,7 @@ module.exports = class extends Generator {
     this.fs.copyTpl(
       this.templatePath("selectors.index.ejs"),
       this.destinationPath(
-        `./src/redux-store/slices/${sliceName}/${sliceName}.selectors.ts`
+        `./redux-store/slices/${sliceName}/${sliceName}.selectors.ts`
       ),
       {
         sliceName,
@@ -94,7 +94,7 @@ module.exports = class extends Generator {
       this.fs.copyTpl(
         this.templatePath("sagas.index.ejs"),
         this.destinationPath(
-          `./src/redux-store/slices/${sliceName}/${sliceName}.sagas.ts`
+          `./redux-store/slices/${sliceName}/${sliceName}.sagas.ts`
         ),
         {
           sliceName,
@@ -103,7 +103,7 @@ module.exports = class extends Generator {
     }
 
     let slicesIndex = this.fs.read(
-      this.destinationPath(`./src/redux-store/slices/index.ts`)
+      this.destinationPath(`./redux-store/slices/index.ts`)
     );
 
     let match = slicesIndex.match(/import(.*?);\n\n/)[0];
@@ -145,14 +145,8 @@ module.exports = class extends Generator {
     }
 
     this.fs.write(
-      this.destinationPath(`./src/redux-store/slices/index.ts`),
+      this.destinationPath(`./redux-store/slices/index.ts`),
       slicesIndex
-    );
-
-    this.log(
-      yosay(
-        "Don't forget to add the new slice to your redux-store/slices/index.tsx file!"
-      )
     );
   }
 };

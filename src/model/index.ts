@@ -46,20 +46,20 @@ module.exports = class extends Generator {
 
     this.fs.copyTpl(
       this.templatePath("index.ejs"),
-      this.destinationPath(`./src/models/${this.answers.modelName}/index.tsx`),
+      this.destinationPath(`./models/${this.answers.modelName}/index.tsx`),
       {
         ...this.answers,
       }
     );
 
     /**
-     * /src/models/index.tsx export file
+     * /models/index.tsx export file
      */
 
     const content = `export * from './${this.answers.modelName}';\n`;
 
     fs.appendFileSync(
-      path.join(this.destinationRoot(), "src", "models", "index.tsx"),
+      path.join(this.destinationRoot(), "models", "index.tsx"),
       content
     );
   }

@@ -58,7 +58,7 @@ module.exports = class extends Generator {
 
     this.fs.copyTpl(
       this.templatePath("index.ejs"),
-      this.destinationPath(`./src/screens/${this.answers.sceneName}/index.tsx`),
+      this.destinationPath(`./screens/${this.answers.sceneName}/index.tsx`),
       {
         ...this.answers,
       }
@@ -72,7 +72,7 @@ module.exports = class extends Generator {
       this.fs.copyTpl(
         this.templatePath("index.hooks.ejs"),
         this.destinationPath(
-          `./src/screens/${this.answers.sceneName}/index.hooks.tsx`
+          `./screens/${this.answers.sceneName}/index.hooks.tsx`
         ),
         {
           ...this.answers,
@@ -88,7 +88,7 @@ module.exports = class extends Generator {
       this.fs.copyTpl(
         this.templatePath("styles.ts"),
         this.destinationPath(
-          `./src/screens/${this.answers.sceneName}/styles.ts`
+          `./screens/${this.answers.sceneName}/styles.ts`
         ),
         {
           ...this.answers,
@@ -97,13 +97,13 @@ module.exports = class extends Generator {
     }
 
     /**
-     * /src/screens/index.tsx export file
+     * /screens/index.tsx export file
      */
 
     const content = `export * from "./${this.answers.sceneName}";\n`;
 
     fs.appendFileSync(
-      path.join(this.destinationRoot(), "src", "screens", "index.tsx"),
+      path.join(this.destinationRoot(), "screens", "index.tsx"),
       content
     );
   }

@@ -175,7 +175,7 @@ module.exports = class extends Generator {
 
     this.fs.write(
       this.destinationPath(
-        `./src/redux-store/extra-actions/apis/${folderName}/index.tsx`
+        `./redux-store/extra-actions/apis/${folderName}/index.tsx`
       ),
       content
     );
@@ -185,7 +185,6 @@ module.exports = class extends Generator {
     fs.appendFileSync(
       path.join(
         this.destinationRoot(),
-        "src",
         "redux-store",
         "extra-actions",
         "apis",

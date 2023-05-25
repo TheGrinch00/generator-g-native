@@ -47,7 +47,7 @@ module.exports = class extends Generator {
     this.fs.copyTpl(
       this.templatePath("index.ejs"),
       this.destinationPath(
-        `./src/components/${this.answers.formName}/index.tsx`
+        `./components/${this.answers.formName}/index.tsx`
       ),
       {
         ...this.answers,
@@ -61,7 +61,7 @@ module.exports = class extends Generator {
     this.fs.copyTpl(
       this.templatePath("index.hooks.ejs"),
       this.destinationPath(
-        `./src/components/${this.answers.formName}/index.hooks.tsx`
+        `./components/${this.answers.formName}/index.hooks.tsx`
       ),
       {
         ...this.answers,
@@ -69,13 +69,13 @@ module.exports = class extends Generator {
     );
 
     /**
-     * /src/forms/index.tsx export file
+     * /forms/index.tsx export file
      */
 
     const content = `export * from './${this.answers.formName}';\n`;
 
     fs.appendFileSync(
-      path.join(this.destinationRoot(), "src", "components", "index.tsx"),
+      path.join(this.destinationRoot(), "components", "index.tsx"),
       content
     );
   }

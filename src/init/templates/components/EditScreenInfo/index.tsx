@@ -1,14 +1,14 @@
-import React, { FC, memo } from "react";
-import { TouchableOpacity } from "react-native";
+import { FC, memo } from "react";
 import { useEditScreenInfo } from "./index.hooks";
-import { Text, View } from "../Themed";
-import { MonoText } from "../StyledText";
-import Colors from "../../constants/Colors";
+
+import Colors from "constants/Colors";
+import { ExternalLink, StyledText } from "components";
+import { Text, View } from "components/Themed";
 
 type EditScreenInfoProps = { path: string };
 
 export const EditScreenInfo: FC<EditScreenInfoProps> = memo(({ path }) => {
-  const { styles, onHelpPressed } = useEditScreenInfo();
+  const { styles } = useEditScreenInfo();
 
   return (
     <View>
@@ -20,15 +20,13 @@ export const EditScreenInfo: FC<EditScreenInfoProps> = memo(({ path }) => {
         >
           Open up the code for this screen:
         </Text>
-
         <View
           style={[styles.codeHighlightContainer, styles.homeScreenFilename]}
           darkColor="rgba(255,255,255,0.05)"
           lightColor="rgba(0,0,0,0.05)"
         >
-          <MonoText>{path}</MonoText>
+          <StyledText>{path}</StyledText>
         </View>
-
         <Text
           style={styles.getStartedText}
           lightColor="rgba(0,0,0,0.8)"
@@ -38,14 +36,16 @@ export const EditScreenInfo: FC<EditScreenInfoProps> = memo(({ path }) => {
           update.
         </Text>
       </View>
-
       <View style={styles.helpContainer}>
-        <TouchableOpacity onPress={onHelpPressed} style={styles.helpLink}>
+        <ExternalLink
+          style={styles.helpLink}
+          href="https://docs.expo.io/get-started/create-a-new-app/#opening-the-app-on-your-phonetablet"
+        >
           <Text style={styles.helpLinkText} lightColor={Colors.light.tint}>
             Tap here if your app doesn't automatically update after making
             changes
           </Text>
-        </TouchableOpacity>
+        </ExternalLink>
       </View>
     </View>
   );

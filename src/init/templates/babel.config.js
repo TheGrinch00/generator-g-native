@@ -3,18 +3,19 @@ module.exports = function (api) {
   return {
     presets: ["babel-preset-expo"],
     plugins: [
+      require.resolve("expo-router/babel"),
       [
         "module-resolver",
         {
           alias: {
-            components: "./src/components",
-            config: "./src/config",
-            constants: "./src/constants",
-            hooks: "./src/hooks",
-            models: "./src/models",
-            navigation: "./src/navigation",
-            "redux-store": "./src/redux-store",
-            screens: "./src/screens",
+            components: "./components",
+            config: "./config",
+            constants: "./constants",
+            hooks: "./hooks",
+            models: "./models",
+            navigation: "./navigation",
+            "redux-store": "./redux-store",
+            screens: "./screens",
           },
         },
       ],

@@ -1,5 +1,5 @@
 import { styles } from "./styles";
 
-export const useModalScreen = () => {
+export const useExternalLink = () => {
   return { styles };
 };

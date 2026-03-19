@@ -49,6 +49,7 @@ export default class PkgCoreGenerator extends Generator {
         "ts-jest": "^29.2.0",
       },
       dependencies: {
+        "expo-router": "*",
         zod: "^3.24.0",
         "@tanstack/react-query": "^5.85.0",
         axios: "^1.12.0",
@@ -67,6 +68,31 @@ export default class PkgCoreGenerator extends Generator {
         translations: false,
       },
     });
+
+    // Create Expo Router app/ directory with root layout
+    this.fs.write(
+      this.destinationPath("app/_layout.tsx"),
+      `import { Stack } from "expo-router";
+
+export default function RootLayout() {
+  return <Stack />;
+}
+`,
+    );
+
+    this.fs.write(
+      this.destinationPath("app/index.tsx"),
+      `import { View, Text } from "react-native";
+
+export default function HomeScreen() {
+  return (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <Text>Home</Text>
+    </View>
+  );
+}
+`,
+    );
 
     // Create src directories
     const dirs = [
@@ -98,7 +124,7 @@ export default class PkgCoreGenerator extends Generator {
       });
 
     try {
-      await run("npm", ["i"]);
+      await run("npx", ["expo", "install", "--fix"]);
     } catch (err) {
       this.log("\n❌ Dependencies installation failed:", err?.message || err);
       throw err;

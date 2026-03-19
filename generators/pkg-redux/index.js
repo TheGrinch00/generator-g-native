@@ -80,7 +80,7 @@ export default class PkgReduxGenerator extends Generator {
       });
 
     try {
-      await run("npm", ["i"]);
+      await run("npx", ["expo", "install", "--fix"]);
     } catch (err) {
       this.log("\n❌ Dependencies installation failed:", err?.message || err);
       throw err;

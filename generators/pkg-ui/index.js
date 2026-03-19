@@ -50,8 +50,8 @@ export default class PkgUiGenerator extends Generator {
     this.packageJson.merge({
       dependencies: {
         nativewind: "^4.1.0",
-        "react-native-reanimated": "~3.16.0",
-        "react-native-safe-area-context": "^4.14.0",
+        "react-native-reanimated": "*",
+        "react-native-safe-area-context": "*",
       },
       devDependencies: {
         tailwindcss: "^3.4.0",
@@ -87,7 +87,7 @@ export default class PkgUiGenerator extends Generator {
       });
 
     try {
-      await run("npm", ["i"]);
+      await run("npx", ["expo", "install", "--fix"]);
     } catch (err) {
       this.log("\n❌ Dependencies installation failed:", err?.message || err);
       throw err;

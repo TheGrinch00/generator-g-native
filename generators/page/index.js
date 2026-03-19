@@ -2,6 +2,7 @@ import Generator from "yeoman-generator";
 import chalk from "chalk";
 import yosay from "yosay";
 import path from "path";
+import fs from "node:fs";
 import { fileSelector, ItemType } from "inquirer-file-selector";
 import { pascalCase } from "pascal-case";
 import { camelCase } from "camel-case";
@@ -47,6 +48,12 @@ export default class PageGenerator extends Generator {
     );
 
     const rootAbs = this.destinationPath(BASE_APP_DIR);
+
+    if (!fs.existsSync(rootAbs)) {
+      fs.mkdirSync(rootAbs, { recursive: true });
+      this.log(chalk.yellow(`Created "${BASE_APP_DIR}/" directory.`));
+    }
+
     const fsSel = await fileSelector({
       message: "Select the parent folder under app/:",
       type: ItemType.Directory,

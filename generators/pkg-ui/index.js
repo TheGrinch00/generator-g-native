@@ -87,6 +87,7 @@ export default class PkgUiGenerator extends Generator {
       });
 
     try {
+      await run("npm", ["install"]);
       await run("npx", ["expo", "install", "--fix"]);
     } catch (err) {
       this.log("\n❌ Dependencies installation failed:", err?.message || err);

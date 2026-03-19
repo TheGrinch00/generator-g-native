@@ -84,7 +84,6 @@ export default class PkgTranslationsGenerator extends Generator {
 
     try {
       await run("npx", ["expo", "install", "expo-localization"]);
-      await run("npm", ["install"]);
     } catch (err) {
       this.log("\n❌ Dependencies installation failed:", err?.message || err);
       throw err;

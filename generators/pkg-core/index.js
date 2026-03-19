@@ -124,7 +124,6 @@ export default function HomeScreen() {
 
     try {
       await run("npx", ["expo", "install", "expo-router"]);
-      await run("npm", ["install"]);
     } catch (err) {
       this.log("\n❌ Dependencies installation failed:", err?.message || err);
       throw err;

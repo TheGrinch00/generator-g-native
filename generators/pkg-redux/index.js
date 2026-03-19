@@ -80,7 +80,6 @@ export default class PkgReduxGenerator extends Generator {
 
     try {
       await run("npx", ["expo", "install", "@react-native-async-storage/async-storage"]);
-      await run("npm", ["install"]);
     } catch (err) {
       this.log("\n❌ Dependencies installation failed:", err?.message || err);
       throw err;

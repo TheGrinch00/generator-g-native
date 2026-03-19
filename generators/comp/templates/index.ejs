@@ -1,0 +1,17 @@
+import React from "react";
+import { View, Text } from "react-native";
+import { use<%= componentName %> } from "./index.hooks";
+
+type <%= componentName %>Props = {}
+
+export const <%= componentName %> = ({}: <%= componentName %>Props) => {
+  const {} = use<%= componentName %>();
+
+  return (
+    <View>
+      <Text><%= componentName %></Text>
+    </View>
+  );
+};
+
+<%= componentName %>.displayName = "<%= componentName %>";

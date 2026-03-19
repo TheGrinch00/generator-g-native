@@ -1,0 +1,50 @@
+import React from "react";
+import { View, Text, Pressable, StyleSheet } from "react-native";
+import { use<%= formName %> } from "./index.hooks";
+
+type <%= formName %>Props = {}
+
+export const <%= formName %> = ({}: <%= formName %>Props) => {
+  const { form } = use<%= formName %>();
+
+  return (
+    <View style={styles.container}>
+      <form.Field
+        name=""
+        children={(field) => (
+          <View>
+            {/* Add your form fields here */}
+          </View>
+        )}
+      />
+
+      <Pressable
+        style={styles.submitButton}
+        onPress={() => form.handleSubmit()}
+      >
+        <Text style={styles.submitText}>Submit</Text>
+      </Pressable>
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+    gap: 16,
+  },
+  submitButton: {
+    backgroundColor: "#007AFF",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  submitText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+});
+
+<%= formName %>.displayName = "<%= formName %>";

@@ -55,7 +55,6 @@ export default class PkgTranslationsGenerator extends Generator {
       dependencies: {
         i18next: "^24.2.0",
         "react-i18next": "^15.4.0",
-        "expo-localization": "*",
       },
     });
 
@@ -84,8 +83,8 @@ export default class PkgTranslationsGenerator extends Generator {
       });
 
     try {
+      await run("npx", ["expo", "install", "expo-localization"]);
       await run("npm", ["install"]);
-      await run("npx", ["expo", "install", "--fix"]);
     } catch (err) {
       this.log("\n❌ Dependencies installation failed:", err?.message || err);
       throw err;

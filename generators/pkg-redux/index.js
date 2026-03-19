@@ -53,7 +53,6 @@ export default class PkgReduxGenerator extends Generator {
         "react-redux": "^9.2.0",
         "redux-persist": "^6.0.0",
         "redux-saga": "^1.3.0",
-        "@react-native-async-storage/async-storage": "^2.1.0",
       },
     });
 
@@ -80,8 +79,8 @@ export default class PkgReduxGenerator extends Generator {
       });
 
     try {
+      await run("npx", ["expo", "install", "@react-native-async-storage/async-storage"]);
       await run("npm", ["install"]);
-      await run("npx", ["expo", "install", "--fix"]);
     } catch (err) {
       this.log("\n❌ Dependencies installation failed:", err?.message || err);
       throw err;

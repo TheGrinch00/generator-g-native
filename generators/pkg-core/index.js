@@ -49,7 +49,6 @@ export default class PkgCoreGenerator extends Generator {
         "ts-jest": "^29.2.0",
       },
       dependencies: {
-        "expo-router": "*",
         zod: "^3.24.0",
         "@tanstack/react-query": "^5.85.0",
         axios: "^1.12.0",
@@ -124,8 +123,8 @@ export default function HomeScreen() {
       });
 
     try {
+      await run("npx", ["expo", "install", "expo-router"]);
       await run("npm", ["install"]);
-      await run("npx", ["expo", "install", "--fix"]);
     } catch (err) {
       this.log("\n❌ Dependencies installation failed:", err?.message || err);
       throw err;

@@ -1,49 +1,52 @@
-# React Native CLI Tool Generator
+# GeNYG Native - React Native Expo Yeoman Generator
 
-Welcome to this tool useful to avoid boilerplate code in your React Native experience created using Node 18. This tool will set you up with a project scaffolding in typescript, a basic navigation (using the `tabs` template) and some useful setup for AJAX calls, redux toolkit and form utilities.
+Yeoman generator for scaffolding React Native (Expo) projects with Expo Router, NativeWind, Redux Toolkit + Sagas, TanStack Form, and i18next.
 
 ## Installation
 
-To install and use it from your machine make sure to have `yeoman` installed: <br /> `npm i -g yo` <br /> <br />
-After installing yeoman, run the following command: <br />
+Make sure you have `yeoman` installed globally:
 
-`npm i -g generator-g-native` <br />
-`yo --generators` <br />
+```bash
+npm i -g yo
+npm i -g @thegrinch00/generator-g-native
+```
 
-And you should see the generator popping up in the list.  <br />
+## Usage
 
-# Commands
+Use the `g-native` CLI shortcut:
 
-This is a list of the available commands:
+```bash
+g-native <subcommand>
+```
 
-## yo g-native:app
+## Commands
 
-Creates the React Native app and uses the `tabs` typescript template
+### Bootstrap
 
-## yo g-native:init
+| Command | Description |
+|---------|-------------|
+| `g-native app` | Creates a new Expo app using `create-expo-app` with blank TypeScript template |
+| `g-native pkg-core` | Installs core dev tools: ESLint, Prettier, Husky, Jest, Zod, React Query, Axios |
+| `g-native pkg-ui` | Installs NativeWind (Tailwind CSS for React Native) and configures it |
+| `g-native pkg-redux` | Installs Redux Toolkit, Redux Saga, Redux Persist, and scaffolds the store |
+| `g-native pkg-translations` | Installs i18next with expo-localization and sets up translation files (en/it) |
 
-Adds useful files and folders, adds dependencies and installs them
+### Generators
 
-## yo g-native:comp
+| Command | Description |
+|---------|-------------|
+| `g-native comp` | Creates a new component with hooks file under `src/components/` |
+| `g-native page` | Creates an Expo Router screen with optional `_layout.tsx` under `app/` |
+| `g-native form` | Creates a form component with TanStack Form + Zod validation |
+| `g-native model` | Creates a TypeScript model (interface + class) under `src/models/` |
+| `g-native slice` | Creates a Redux slice with interfaces, selectors, and optional sagas |
+| `g-native version` | Displays the current generator version |
 
-Creates a new component inside the `src/components` folder
+## Recommended Setup Order
 
-## yo g-native:slice
-
-Creates a new redux slice inside the `src/redux-store` folder with all the boilerplate code already in place and ready to use
-
-## yo g-native:ajax
-
-Creates a redux action that will trigger an AJAX call to the specified endpoint
-
-## yo g-native:form
-
-Creates a new component with all boilerplate code to create a form with `react-hook-form` and validations via `yup`
-
-## yo g-native:model
-
-Creates a new TypeScript class representing a data model inside the `src/models` folder
-
-## yo g-native:screen
-
-Creates a new component inside the `src/screens` folder
+1. `g-native app` - Create the Expo project
+2. `g-native pkg-core` - Install core development tools
+3. `g-native pkg-ui` - Set up NativeWind
+4. `g-native pkg-redux` - Set up Redux store
+5. `g-native pkg-translations` - Set up i18n (optional)
+6. Start generating components, pages, forms, models, and slices as needed

@@ -55,6 +55,12 @@ export default class PkgCoreGenerator extends Generator {
       },
     });
 
+    // Create .npmrc to avoid peer dependency conflicts from expo-router's transitive deps
+    this.fs.write(
+      this.destinationPath(".npmrc"),
+      "legacy-peer-deps=true\n",
+    );
+
     // Copy project config files (dotfiles only in this template)
     this.fs.copy(this.templatePath(".*"), this.destinationRoot());
 

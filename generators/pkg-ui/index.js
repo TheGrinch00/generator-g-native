@@ -85,7 +85,7 @@ export default class PkgUiGenerator extends Generator {
       });
 
     try {
-      await run("npx", ["expo", "install", "react-native-reanimated", "react-native-safe-area-context"]);
+      await run("npx", ["expo", "install", "react-native-reanimated", "react-native-worklets"]);
     } catch (err) {
       this.log("\n❌ Dependencies installation failed:", err?.message || err);
       throw err;

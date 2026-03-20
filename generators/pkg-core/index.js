@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import Generator from "yeoman-generator";
 import chalk from "chalk";
 import yosay from "yosay";
@@ -33,7 +34,9 @@ export default class PkgCoreGenerator extends Generator {
   writing() {
     if (this.abort) return;
 
+    // Set entry point to expo-router
     this.packageJson.merge({
+      main: "expo-router/entry",
       scripts: {
         lint: "eslint .",
         tsc: "tsc --noEmit",
@@ -54,6 +57,27 @@ export default class PkgCoreGenerator extends Generator {
         axios: "^1.12.0",
       },
     });
+
+    // Update app.json with scheme for expo-router deep linking
+    const appJsonPath = this.destinationPath("app.json");
+    if (fs.existsSync(appJsonPath)) {
+      const appJson = this.fs.readJSON(appJsonPath);
+      appJson.expo = appJson.expo || {};
+      appJson.expo.scheme = appJson.expo.scheme || appJson.expo.slug || "app";
+      appJson.expo.plugins = appJson.expo.plugins || [];
+      if (!appJson.expo.plugins.includes("expo-router")) {
+        appJson.expo.plugins.push("expo-router");
+      }
+      this.fs.writeJSON(appJsonPath, appJson);
+    }
+
+    // Remove old entry point files (replaced by expo-router/entry)
+    for (const file of ["index.ts", "index.js", "App.tsx", "App.js"]) {
+      const filePath = this.destinationPath(file);
+      if (fs.existsSync(filePath)) {
+        this.fs.delete(filePath);
+      }
+    }
 
     // Create .npmrc to avoid peer dependency conflicts from expo-router's transitive deps
     this.fs.write(
@@ -129,7 +153,16 @@ export default function HomeScreen() {
       });
 
     try {
-      await run("npx", ["expo", "install", "expo-router"]);
+      await run("npx", ["expo", "install",
+        "expo-router",
+        "expo-linking",
+        "expo-constants",
+        "react-native-screens",
+        "react-native-safe-area-context",
+        "react-native-gesture-handler",
+        "react-dom",
+        "@expo/metro-runtime",
+      ]);
     } catch (err) {
       this.log("\n❌ Dependencies installation failed:", err?.message || err);
       throw err;

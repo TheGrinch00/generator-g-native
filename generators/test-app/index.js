@@ -80,6 +80,7 @@ export default class TestAppGenerator extends Generator {
         "react-dom",
         "@expo/metro-runtime",
         "@react-native-async-storage/async-storage",
+        "react-native-svg",
       ]);
     } catch (err) {
       this.log("\n❌ Dependencies installation failed:", err?.message || err);
@@ -123,6 +124,8 @@ export default class TestAppGenerator extends Generator {
       if (!appJson.expo.plugins.includes("expo-router")) {
         appJson.expo.plugins.push("expo-router");
       }
+      appJson.expo.web = appJson.expo.web || {};
+      appJson.expo.web.bundler = "metro";
       this.fs.writeJSON(appJsonPath, appJson);
     }
 
@@ -388,7 +391,8 @@ export default class TestAppGenerator extends Generator {
   _writeRootLayout() {
     this.fs.write(
       this.destinationPath("app/_layout.tsx"),
-      `import { Stack } from "expo-router";
+      `import "../global.css";
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StoreProvider } from "@/src/redux-store/StoreProvider";

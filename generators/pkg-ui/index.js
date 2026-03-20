@@ -61,11 +61,28 @@ export default class PkgUiGenerator extends Generator {
     // Copy template files
     this.fs.copy(this.templatePath("."), this.destinationPath("."));
 
+    // Ensure app.json has web bundler set to metro (required by NativeWind)
+    const appJsonPath = this.destinationPath("app.json");
+    const appJson = this.fs.readJSON(appJsonPath);
+    if (appJson) {
+      appJson.expo = appJson.expo || {};
+      appJson.expo.web = appJson.expo.web || {};
+      appJson.expo.web.bundler = "metro";
+      this.fs.writeJSON(appJsonPath, appJson);
+    }
+
     // Create global.css
     this.fs.write(
       this.destinationPath("global.css"),
       `@tailwind base;\n@tailwind components;\n@tailwind utilities;\n`,
     );
+
+    // Add global.css import to root layout
+    const layoutPath = this.destinationPath("app/_layout.tsx");
+    const layoutContent = this.fs.read(layoutPath);
+    if (layoutContent && !layoutContent.includes("global.css")) {
+      this.fs.write(layoutPath, `import "../global.css";\n${layoutContent}`);
+    }
 
     extendConfigFile(this, {
       packages: {
@@ -87,7 +104,7 @@ export default class PkgUiGenerator extends Generator {
       });
 
     try {
-      await run("npx", ["expo", "install", "react-native-reanimated", "react-native-worklets"]);
+      await run("npx", ["expo", "install", "react-native-reanimated", "react-native-worklets", "react-native-svg"]);
     } catch (err) {
       this.log("\n❌ Dependencies installation failed:", err?.message || err);
       throw err;

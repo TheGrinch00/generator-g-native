@@ -1,8 +1,8 @@
 import { createFormHook, createFormHookContexts } from "@tanstack/react-form";
 
-import { FormTextField } from "@/components/_input/FormTextField";
-import { FormSwitch } from "@/components/_input/FormSwitch";
-import { FormSelect } from "@/components/_input/FormSelect";
+import { FormTextField } from "@/src/components/_input/FormTextField";
+import { FormSwitch } from "@/src/components/_input/FormSwitch";
+import { FormSelect } from "@/src/components/_input/FormSelect";
 
 export const { fieldContext, useFieldContext, formContext, useFormContext } =
   createFormHookContexts();

@@ -79,6 +79,18 @@ export default class PkgCoreGenerator extends Generator {
       }
     }
 
+    // Update tsconfig.json with path aliases
+    const tsconfigPath = this.destinationPath("tsconfig.json");
+    if (fs.existsSync(tsconfigPath)) {
+      const tsconfig = this.fs.readJSON(tsconfigPath);
+      tsconfig.compilerOptions = tsconfig.compilerOptions || {};
+      tsconfig.compilerOptions.baseUrl = ".";
+      tsconfig.compilerOptions.paths = {
+        "@/*": ["./*"],
+      };
+      this.fs.writeJSON(tsconfigPath, tsconfig);
+    }
+
     // Create .npmrc to avoid peer dependency conflicts from expo-router's transitive deps
     this.fs.write(
       this.destinationPath(".npmrc"),

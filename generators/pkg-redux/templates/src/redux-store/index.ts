@@ -22,6 +22,7 @@ export const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
+        ignoredPaths: ["register"],
       },
     }).concat(sagaMiddleware),
 });

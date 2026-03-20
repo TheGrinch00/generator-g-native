@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Text, TextInput, TextInputProps, View } from "react-native";
-import { useFieldContext } from "@/components/_form";
-import { FieldErrors } from "@/components/_form/FieldErrors";
+import { useFieldContext } from "@/src/components/_form";
+import { FieldErrors } from "@/src/components/_form/FieldErrors";
 
 type FormTextFieldProps = {
   label?: string;

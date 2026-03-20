@@ -1,6 +1,6 @@
 import { Platform, Switch, SwitchProps, Text, View } from "react-native";
-import { useFieldContext } from "@/components/_form";
-import { FieldErrors } from "@/components/_form/FieldErrors";
+import { useFieldContext } from "@/src/components/_form";
+import { FieldErrors } from "@/src/components/_form/FieldErrors";
 
 type FormSwitchProps = {
   label?: string;

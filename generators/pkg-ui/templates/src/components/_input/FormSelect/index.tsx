@@ -7,8 +7,8 @@ import {
   View,
 } from "react-native";
 import { ChevronDown, Check } from "lucide-react-native";
-import { useFieldContext } from "@/components/_form";
-import { FieldErrors } from "@/components/_form/FieldErrors";
+import { useFieldContext } from "@/src/components/_form";
+import { FieldErrors } from "@/src/components/_form/FieldErrors";
 
 type FormSelectOption = {
   value: string | number;

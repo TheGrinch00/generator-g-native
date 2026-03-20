@@ -496,6 +496,7 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useColorScheme } from "nativewind";
 import { StoreProvider } from "@/src/redux-store/StoreProvider";
+import { AppToast } from "@/src/components/AppToast";
 import { themeVars } from "@/src/theme";
 import "@/src/i18n";
 
@@ -508,6 +509,7 @@ export default function RootLayout() {
         <SafeAreaProvider>
           <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
           <Stack screenOptions={{ headerShown: false }} />
+          <AppToast />
         </SafeAreaProvider>
       </View>
     </StoreProvider>
@@ -1301,6 +1303,7 @@ import * as extraActions from "../extra-actions";
 
 import * as ui from "./ui";
 import * as ajax from "./ajax";
+import * as feedback from "./feedback";
 import * as counter from "./counter";
 import * as contacts from "./contacts";
 import * as posts from "./posts";
@@ -1308,6 +1311,7 @@ import * as posts from "./posts";
 export const reducers = {
   ui: ui.uiStore.reducer,
   ajax: ajax.ajaxStore.reducer,
+  feedback: feedback.feedbackStore.reducer,
   counter: counter.counterStore.reducer,
   contacts: contacts.contactsStore.reducer,
   posts: posts.postsStore.reducer,
@@ -1317,6 +1321,7 @@ export const actions = {
   ...extraActions,
   ...ui.uiStore.actions,
   ...ajax.ajaxStore.actions,
+  ...feedback.feedbackStore.actions,
   ...counter.counterStore.actions,
   ...contacts.contactsStore.actions,
   ...posts.postsStore.actions,
@@ -1325,6 +1330,7 @@ export const actions = {
 export const selectors = {
   ...ui.selectors,
   ...ajax.selectors,
+  ...feedback.selectors,
   ...counter.selectors,
   ...contacts.selectors,
   ...posts.selectors,
@@ -1333,6 +1339,7 @@ export const selectors = {
 export const sagas = [
   ...Object.values(ui.sagas),
   ...Object.values(ajax.sagas),
+  ...Object.values(feedback.sagas),
   ...Object.values(counter.sagas),
   ...Object.values(contacts.sagas),
   ...Object.values(posts.sagas),

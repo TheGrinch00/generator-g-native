@@ -2,10 +2,10 @@ export default ({ ScreenName, screenTitle }) => `import { View, Text, Pressable 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useThemeColors } from "@/src/theme";
+import { use${ScreenName}Screen } from "./index.hooks";
 
 export default function ${ScreenName}Screen() {
-  const theme = useThemeColors();
+  const { theme } = use${ScreenName}Screen();
 
   return (
     <SafeAreaView className="flex-1 bg-background">

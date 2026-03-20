@@ -10,10 +10,14 @@ import { requirePackages } from "../../common/index.js";
 
 import screenTplMod from "./templates/screen.js";
 import screenDynTplMod from "./templates/screen.dynamic.js";
+import screenHooksTplMod from "./templates/screen.hooks.js";
+import screenDynHooksTplMod from "./templates/screen.dynamic.hooks.js";
 import layoutTplMod from "./templates/layout.js";
 
 const screenTpl = screenTplMod?.default || screenTplMod;
 const screenDynamicTpl = screenDynTplMod?.default || screenDynTplMod;
+const screenHooksTpl = screenHooksTplMod?.default || screenHooksTplMod;
+const screenDynamicHooksTpl = screenDynHooksTplMod?.default || screenDynHooksTplMod;
 const layoutTpl = layoutTplMod?.default || layoutTplMod;
 
 const BASE_APP_DIR = "app";
@@ -132,12 +136,20 @@ export default class PageGenerator extends Generator {
       segFolder,
     );
 
-    // For Expo Router, the screen file is index.tsx inside the folder
+    // Screen UI
     this.fs.write(
       this.destinationPath(path.posix.join(routeDir, "index.tsx")),
       isDynamic
         ? screenDynamicTpl({ ScreenName, screenTitle, paramType, paramId })
         : screenTpl({ ScreenName, screenTitle }),
+    );
+
+    // Screen hooks (business logic)
+    this.fs.write(
+      this.destinationPath(path.posix.join(routeDir, "index.hooks.tsx")),
+      isDynamic
+        ? screenDynamicHooksTpl({ ScreenName, paramType, paramId })
+        : screenHooksTpl({ ScreenName }),
     );
 
     if (includeLayout) {

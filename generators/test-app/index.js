@@ -498,12 +498,10 @@ export default function RootLayout() {
       this.destinationPath("app/(tabs)/_layout.tsx"),
       `import { Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useTranslation } from "react-i18next";
-import { useThemeColors } from "@/src/theme";
+import { useTabsLayout } from "./_layout.hooks";
 
 export default function TabsLayout() {
-  const { t } = useTranslation();
-  const theme = useThemeColors();
+  const { t, theme } = useTabsLayout();
 
   return (
     <Tabs
@@ -545,6 +543,20 @@ export default function TabsLayout() {
 }
 `,
     );
+
+    this.fs.write(
+      this.destinationPath("app/(tabs)/_layout.hooks.tsx"),
+      `import { useTranslation } from "react-i18next";
+import { useThemeColors } from "@/src/theme";
+
+export const useTabsLayout = () => {
+  const { t } = useTranslation();
+  const theme = useThemeColors();
+
+  return { t, theme };
+};
+`,
+    );
   }
 
   // ─── Home Screen ──────────────────────────────────────────
@@ -554,14 +566,11 @@ export default function TabsLayout() {
       this.destinationPath("app/(tabs)/index.tsx"),
       `import { View, Text, Pressable, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { router } from "expo-router";
-import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useThemeColors } from "@/src/theme";
+import { useHomeScreen } from "./index.hooks";
 
 export default function HomeScreen() {
-  const { t } = useTranslation();
-  const theme = useThemeColors();
+  const { t, theme, navigateTo } = useHomeScreen();
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -578,19 +587,22 @@ export default function HomeScreen() {
             icon={<Ionicons name="keypad" size={22} color={theme.primary} />}
             title={t("home.counterCard")}
             description={t("home.counterDescription")}
-            onPress={() => router.push("/counter")}
+            onPress={() => navigateTo("/counter")}
+            chevronColor={theme.border}
           />
           <NavCard
             icon={<Ionicons name="mail" size={22} color={theme.secondary} />}
             title={t("home.formCard")}
             description={t("home.formDescription")}
-            onPress={() => router.push("/contact")}
+            onPress={() => navigateTo("/contact")}
+            chevronColor={theme.border}
           />
           <NavCard
             icon={<Ionicons name="person" size={22} color={theme.accent} />}
             title={t("home.profileCard")}
             description={t("home.profileDescription")}
-            onPress={() => router.push("/profile/demo-user")}
+            onPress={() => navigateTo("/profile/demo-user")}
+            chevronColor={theme.border}
           />
         </View>
       </ScrollView>
@@ -603,14 +615,14 @@ function NavCard({
   title,
   description,
   onPress,
+  chevronColor,
 }: {
   icon: React.ReactNode;
   title: string;
   description: string;
   onPress: () => void;
+  chevronColor: string;
 }) {
-  const theme = useThemeColors();
-
   return (
     <Pressable
       className="flex-row items-center bg-card rounded-2xl p-4 border border-border active:opacity-80"
@@ -623,10 +635,29 @@ function NavCard({
         <Text className="text-base font-semibold text-foreground">{title}</Text>
         <Text className="text-sm text-muted mt-0.5">{description}</Text>
       </View>
-      <Ionicons name="chevron-forward" size={20} color={theme.border} />
+      <Ionicons name="chevron-forward" size={20} color={chevronColor} />
     </Pressable>
   );
 }
+`,
+    );
+
+    this.fs.write(
+      this.destinationPath("app/(tabs)/index.hooks.tsx"),
+      `import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
+import { useThemeColors } from "@/src/theme";
+
+export const useHomeScreen = () => {
+  const { t } = useTranslation();
+  const theme = useThemeColors();
+
+  const navigateTo = (path: string) => {
+    router.push(path as any);
+  };
+
+  return { t, theme, navigateTo };
+};
 `,
     );
   }
@@ -638,25 +669,20 @@ function NavCard({
       this.destinationPath("app/(tabs)/settings.tsx"),
       `import { View, Text, Pressable, Switch, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { colorScheme, useColorScheme } from "nativewind";
-import { useTranslation } from "react-i18next";
-import { useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useThemeColors } from "@/src/theme";
+import { useSettingsScreen } from "./settings.hooks";
 
 export default function SettingsScreen() {
-  const { t, i18n } = useTranslation();
-  const { colorScheme: currentScheme } = useColorScheme();
-  const [notifications, setNotifications] = useState(true);
-  const theme = useThemeColors();
-
-  const toggleDarkMode = () => {
-    colorScheme.set(currentScheme === "dark" ? "light" : "dark");
-  };
-
-  const toggleLanguage = () => {
-    i18n.changeLanguage(i18n.language === "en" ? "it" : "en");
-  };
+  const {
+    t,
+    theme,
+    currentLanguage,
+    toggleLanguage,
+    isDarkMode,
+    toggleDarkMode,
+    notifications,
+    setNotifications,
+  } = useSettingsScreen();
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -675,7 +701,7 @@ export default function SettingsScreen() {
                 className="bg-primary/10 px-3 py-1.5 rounded-lg active:bg-primary/20"
               >
                 <Text className="text-primary font-semibold text-sm">
-                  {i18n.language.toUpperCase()}
+                  {currentLanguage}
                 </Text>
               </Pressable>
             }
@@ -685,7 +711,7 @@ export default function SettingsScreen() {
             label={t("settings.darkMode")}
             right={
               <Switch
-                value={currentScheme === "dark"}
+                value={isDarkMode}
                 onValueChange={toggleDarkMode}
                 trackColor={{ false: theme.switchTrack, true: theme.switchTrackActive }}
                 thumbColor={Platform.OS === "android" ? theme.switchThumb : undefined}
@@ -748,24 +774,60 @@ function SettingRow({
 }
 `,
     );
+
+    this.fs.write(
+      this.destinationPath("app/(tabs)/settings.hooks.tsx"),
+      `import { useState } from "react";
+import { colorScheme, useColorScheme } from "nativewind";
+import { useTranslation } from "react-i18next";
+import { useThemeColors } from "@/src/theme";
+
+export const useSettingsScreen = () => {
+  const { t, i18n } = useTranslation();
+  const { colorScheme: currentScheme } = useColorScheme();
+  const [notifications, setNotifications] = useState(true);
+  const theme = useThemeColors();
+
+  const isDarkMode = currentScheme === "dark";
+
+  const toggleDarkMode = () => {
+    colorScheme.set(isDarkMode ? "light" : "dark");
+  };
+
+  const toggleLanguage = () => {
+    i18n.changeLanguage(i18n.language === "en" ? "it" : "en");
+  };
+
+  const currentLanguage = i18n.language.toUpperCase();
+
+  return {
+    t,
+    theme,
+    currentLanguage,
+    toggleLanguage,
+    isDarkMode,
+    toggleDarkMode,
+    notifications,
+    setNotifications,
+  };
+};
+`,
+    );
   }
 
   // ─── Profile (dynamic route) ──────────────────────────────
 
   _writeProfileScreen() {
     this.fs.write(
-      this.destinationPath("app/profile/[id].tsx"),
+      this.destinationPath("app/profile/[id]/index.tsx"),
       `import { View, Text, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { router, useLocalSearchParams } from "expo-router";
-import { useTranslation } from "react-i18next";
+import { router } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useThemeColors } from "@/src/theme";
+import { useProfileScreen } from "./index.hooks";
 
 export default function ProfileScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const { t } = useTranslation();
-  const theme = useThemeColors();
+  const { t, theme, id } = useProfileScreen();
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -792,6 +854,22 @@ export default function ProfileScreen() {
 }
 `,
     );
+
+    this.fs.write(
+      this.destinationPath("app/profile/[id]/index.hooks.tsx"),
+      `import { useLocalSearchParams } from "expo-router";
+import { useTranslation } from "react-i18next";
+import { useThemeColors } from "@/src/theme";
+
+export const useProfileScreen = () => {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { t } = useTranslation();
+  const theme = useThemeColors();
+
+  return { t, theme, id };
+};
+`,
+    );
   }
 
   // ─── Contact Form Screen ──────────────────────────────────
@@ -802,15 +880,11 @@ export default function ProfileScreen() {
       `import { View, Text, Pressable, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useThemeColors } from "@/src/theme";
-import { useContactForm } from "./index.hooks";
+import { useContactScreen } from "./index.hooks";
 
 export default function ContactScreen() {
-  const { t } = useTranslation();
-  const { form } = useContactForm();
-  const theme = useThemeColors();
+  const { t, theme, form } = useContactScreen();
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -913,10 +987,11 @@ export default function ContactScreen() {
     );
 
     this.fs.write(
-      this.destinationPath("app/contact/index.hooks.ts"),
+      this.destinationPath("app/contact/index.hooks.tsx"),
       `import { z } from "zod";
 import { Alert } from "react-native";
 import { useTranslation } from "react-i18next";
+import { useThemeColors } from "@/src/theme";
 import { useAppForm } from "@/src/components/_form";
 import { useAppDispatch } from "@/src/redux-store/hooks";
 import { actions } from "@/src/redux-store/slices";
@@ -930,8 +1005,9 @@ const schema = z.object({
   newsletter: z.boolean(),
 });
 
-export const useContactForm = () => {
+export const useContactScreen = () => {
   const { t } = useTranslation();
+  const theme = useThemeColors();
   const dispatch = useAppDispatch();
 
   const form = useAppForm({
@@ -957,7 +1033,7 @@ export const useContactForm = () => {
     },
   });
 
-  return { form };
+  return { t, theme, form };
 };
 `,
     );
@@ -971,17 +1047,11 @@ export const useContactForm = () => {
       `import { View, Text, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useThemeColors } from "@/src/theme";
-import { useAppDispatch, useAppSelector } from "@/src/redux-store/hooks";
-import { actions, selectors } from "@/src/redux-store/slices";
+import { useCounterScreen } from "./index.hooks";
 
 export default function CounterScreen() {
-  const { t } = useTranslation();
-  const dispatch = useAppDispatch();
-  const count = useAppSelector(selectors.getCount);
-  const theme = useThemeColors();
+  const { t, theme, count, increment, decrement, reset } = useCounterScreen();
 
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -1004,21 +1074,21 @@ export default function CounterScreen() {
         <View className="flex-row gap-4">
           <Pressable
             className="w-14 h-14 rounded-2xl bg-destructive/10 items-center justify-center border border-destructive/20 active:opacity-70"
-            onPress={() => dispatch(actions.decrement())}
+            onPress={decrement}
           >
             <Ionicons name="remove" size={22} color={theme.destructive} />
           </Pressable>
 
           <Pressable
             className="w-14 h-14 rounded-2xl bg-card items-center justify-center border border-border active:opacity-70"
-            onPress={() => dispatch(actions.reset())}
+            onPress={reset}
           >
             <Ionicons name="refresh" size={20} color={theme.muted} />
           </Pressable>
 
           <Pressable
             className="w-14 h-14 rounded-2xl bg-success/10 items-center justify-center border border-success/20 active:opacity-70"
-            onPress={() => dispatch(actions.increment())}
+            onPress={increment}
           >
             <Ionicons name="add" size={22} color={theme.success} />
           </Pressable>
@@ -1027,6 +1097,28 @@ export default function CounterScreen() {
     </SafeAreaView>
   );
 }
+`,
+    );
+
+    this.fs.write(
+      this.destinationPath("app/counter/index.hooks.tsx"),
+      `import { useTranslation } from "react-i18next";
+import { useThemeColors } from "@/src/theme";
+import { useAppDispatch, useAppSelector } from "@/src/redux-store/hooks";
+import { actions, selectors } from "@/src/redux-store/slices";
+
+export const useCounterScreen = () => {
+  const { t } = useTranslation();
+  const theme = useThemeColors();
+  const dispatch = useAppDispatch();
+  const count = useAppSelector(selectors.getCount);
+
+  const increment = () => dispatch(actions.increment());
+  const decrement = () => dispatch(actions.decrement());
+  const reset = () => dispatch(actions.reset());
+
+  return { t, theme, count, increment, decrement, reset };
+};
 `,
     );
   }

@@ -1,14 +1,11 @@
-export default ({ ScreenName, screenTitle, paramType, paramId }) => `import { View, Text, Pressable } from "react-native";
+export default ({ ScreenName, screenTitle, paramId }) => `import { View, Text, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useThemeColors } from "@/src/theme";
-
-type Params = ${paramType};
+import { use${ScreenName}Screen } from "./index.hooks";
 
 export default function ${ScreenName}Screen() {
-  const { ${paramId} } = useLocalSearchParams<Params>();
-  const theme = useThemeColors();
+  const { ${paramId}, theme } = use${ScreenName}Screen();
 
   return (
     <SafeAreaView className="flex-1 bg-background">

@@ -2,20 +2,25 @@
 import * as extraActions from "../extra-actions";
 
 import * as ui from "./ui";
+import * as ajax from "./ajax";
 
 export const reducers = {
   ui: ui.uiStore.reducer,
+  ajax: ajax.ajaxStore.reducer,
 };
 
 export const actions = {
   ...extraActions,
   ...ui.uiStore.actions,
+  ...ajax.ajaxStore.actions,
 };
 
 export const selectors = {
   ...ui.selectors,
+  ...ajax.selectors,
 };
 
 export const sagas = [
   ...Object.values(ui.sagas),
+  ...Object.values(ajax.sagas),
 ];

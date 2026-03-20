@@ -1,10 +1,8 @@
-import { useState } from "react";
 import { Modal, Pressable, Text, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useFieldContext } from "@/src/components/_form";
 import { FieldErrors } from "@/src/components/_form/FieldErrors";
-import { useThemeColors } from "@/src/theme";
+import { useFormSelect } from "./index.hooks";
 
 type FormSelectOption = {
   value: string | number;
@@ -18,12 +16,16 @@ type FormSelectProps = {
 };
 
 export const FormSelect = ({ label, placeholder, options }: FormSelectProps) => {
-  const field = useFieldContext<string | number | null>();
-  const [visible, setVisible] = useState(false);
-  const hasError = field.state.meta.isTouched && field.state.meta.errors.length > 0;
-  const theme = useThemeColors();
-
-  const selectedOption = options.find((o) => o.value === field.state.value);
+  const {
+    field,
+    visible,
+    hasError,
+    theme,
+    selectedOption,
+    open,
+    close,
+    select,
+  } = useFormSelect(options);
 
   return (
     <View className="gap-1.5">
@@ -35,7 +37,7 @@ export const FormSelect = ({ label, placeholder, options }: FormSelectProps) => 
         className={`flex-row items-center justify-between bg-input rounded-xl px-4 h-12 ${
           hasError ? "border-2 border-destructive" : "border border-border"
         }`}
-        onPress={() => setVisible(true)}
+        onPress={open}
       >
         <Text
           className={
@@ -52,7 +54,7 @@ export const FormSelect = ({ label, placeholder, options }: FormSelectProps) => 
       <Modal visible={visible} transparent animationType="fade">
         <Pressable
           className="flex-1 bg-black/40 justify-end"
-          onPress={() => setVisible(false)}
+          onPress={close}
         >
           <Pressable
             className="bg-background rounded-t-3xl max-h-[60%]"
@@ -78,10 +80,7 @@ export const FormSelect = ({ label, placeholder, options }: FormSelectProps) => 
                     className={`flex-row items-center justify-between px-5 py-4 ${
                       isSelected ? "bg-primary/10" : "active:bg-card"
                     }`}
-                    onPress={() => {
-                      field.handleChange(item.value);
-                      setVisible(false);
-                    }}
+                    onPress={() => select(item.value)}
                   >
                     <Text
                       className={`text-base ${

@@ -112,6 +112,7 @@ export default class TestAppGenerator extends Generator {
         zod: "^3.24.0",
         "@tanstack/react-query": "^5.85.0",
         axios: "^1.12.0",
+        qs: "^6.14.0",
       },
     });
 
@@ -161,10 +162,7 @@ export default class TestAppGenerator extends Generator {
     const dirs = [
       "src/components",
       "src/models",
-      "src/lib",
       "src/hooks",
-      "src/constants",
-      "src/services",
     ];
     for (const dir of dirs) {
       this.fs.write(this.destinationPath(`${dir}/.gitkeep`), "");
@@ -326,6 +324,11 @@ export const themeVars = {
     this._writeContactsSlice();
     this._writeSlicesIndex();
     this._writeContactModel();
+    this._writeConfig();
+    this._writeApisIndex();
+    this._writePostsScreen();
+    this._writePostsSlice();
+    this._writeGetPostsAction();
   }
 
   // ─── Translations ──────────────────────────────────────────
@@ -356,6 +359,8 @@ export const themeVars = {
         formDescription: "Test TanStack Form inputs",
         profileCard: "Profile",
         profileDescription: "Dynamic route example",
+        postsCard: "API Posts",
+        postsDescription: "Test Redux AJAX actions",
       },
       settings: {
         title: "Settings",
@@ -392,6 +397,15 @@ export const themeVars = {
         title: "Profile",
         greeting: "Hello, {{name}}!",
       },
+      posts: {
+        title: "Posts",
+        subtitle: "Data from JSONPlaceholder API",
+        loading: "Loading posts...",
+        error: "Failed to load posts",
+        empty: "No posts found",
+        retry: "Retry",
+        byUser: "User {{id}}",
+      },
     });
 
     this.fs.writeJSON(this.destinationPath("src/i18n/locales/it.json"), {
@@ -419,6 +433,8 @@ export const themeVars = {
         formDescription: "Testa gli input di TanStack Form",
         profileCard: "Profilo",
         profileDescription: "Esempio di rotta dinamica",
+        postsCard: "Post API",
+        postsDescription: "Testa le azioni AJAX Redux",
       },
       settings: {
         title: "Impostazioni",
@@ -454,6 +470,15 @@ export const themeVars = {
       profile: {
         title: "Profilo",
         greeting: "Ciao, {{name}}!",
+      },
+      posts: {
+        title: "Post",
+        subtitle: "Dati dall'API JSONPlaceholder",
+        loading: "Caricamento post...",
+        error: "Impossibile caricare i post",
+        empty: "Nessun post trovato",
+        retry: "Riprova",
+        byUser: "Utente {{id}}",
       },
     });
   }
@@ -602,6 +627,13 @@ export default function HomeScreen() {
             title={t("home.profileCard")}
             description={t("home.profileDescription")}
             onPress={() => navigateTo("/profile/demo-user")}
+            chevronColor={theme.border}
+          />
+          <NavCard
+            icon={<Ionicons name="cloud-download" size={22} color={theme.success} />}
+            title={t("home.postsCard")}
+            description={t("home.postsDescription")}
+            onPress={() => navigateTo("/posts")}
             chevronColor={theme.border}
           />
         </View>
@@ -1267,32 +1299,42 @@ export const getContactCount = (state: RootState) => state?.contacts?.items?.len
 import * as extraActions from "../extra-actions";
 
 import * as ui from "./ui";
+import * as ajax from "./ajax";
 import * as counter from "./counter";
 import * as contacts from "./contacts";
+import * as posts from "./posts";
 
 export const reducers = {
   ui: ui.uiStore.reducer,
+  ajax: ajax.ajaxStore.reducer,
   counter: counter.counterStore.reducer,
   contacts: contacts.contactsStore.reducer,
+  posts: posts.postsStore.reducer,
 };
 
 export const actions = {
   ...extraActions,
   ...ui.uiStore.actions,
+  ...ajax.ajaxStore.actions,
   ...counter.counterStore.actions,
   ...contacts.contactsStore.actions,
+  ...posts.postsStore.actions,
 };
 
 export const selectors = {
   ...ui.selectors,
+  ...ajax.selectors,
   ...counter.selectors,
   ...contacts.selectors,
+  ...posts.selectors,
 };
 
 export const sagas = [
   ...Object.values(ui.sagas),
+  ...Object.values(ajax.sagas),
   ...Object.values(counter.sagas),
   ...Object.values(contacts.sagas),
+  ...Object.values(posts.sagas),
 ];
 `,
     );
@@ -1337,6 +1379,259 @@ export class Contact implements IContact {
   }
 }
 `,
+    );
+  }
+
+  // ─── Config ──────────────────────────────────────────────
+
+  _writeConfig() {
+    this.fs.write(
+      this.destinationPath("src/config/index.ts"),
+      `export const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL || "https://jsonplaceholder.typicode.com";
+`,
+    );
+  }
+
+  // ─── APIs index (extra-actions/apis barrel export) ──────
+
+  _writeApisIndex() {
+    this.fs.write(
+      this.destinationPath("src/redux-store/extra-actions/apis/index.tsx"),
+      `export { default as getPosts } from "./get-posts";
+`,
+    );
+
+    this.fs.write(
+      this.destinationPath("src/redux-store/extra-actions/index.ts"),
+      `export * from "./life-cycle";
+export * from "./apis";
+`,
+    );
+  }
+
+  // ─── Get Posts AJAX Action ─────────────────────────────
+
+  _writeGetPostsAction() {
+    this.fs.write(
+      this.destinationPath("src/redux-store/extra-actions/apis/get-posts/index.tsx"),
+      `import {
+  apiActionBuilder,
+  apiRequestPayloadBuilder,
+  ApiRequestPayloadBuilderOptions,
+  ApiSuccessAction,
+  ApiFailAction,
+  HttpMethod,
+} from "../api-builder";
+
+export interface GetPostsParams {}
+export interface GetPostsResponseData {
+  userId: number;
+  id: number;
+  title: string;
+  body: string;
+}
+export default apiActionBuilder<
+  GetPostsParams,
+  ApiSuccessAction<GetPostsResponseData[], GetPostsParams>,
+  ApiFailAction<GetPostsParams>
+>(
+  "apis/posts/get",
+  (
+    params: GetPostsParams,
+    options?: ApiRequestPayloadBuilderOptions,
+  ) => ({
+    payload: apiRequestPayloadBuilder<GetPostsParams>(
+      {
+        path: "/posts",
+        method: HttpMethod.GET,
+      },
+      options,
+      params,
+    ),
+  }),
+);
+`,
+    );
+  }
+
+  // ─── Posts Screen ──────────────────────────────────────
+
+  _writePostsScreen() {
+    this.fs.write(
+      this.destinationPath("app/posts/index.tsx"),
+      `import { View, Text, Pressable, ActivityIndicator } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
+import { FlashList } from "@shopify/flash-list";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { usePostsScreen } from "./index.hooks";
+
+export default function PostsScreen() {
+  const { t, theme, posts, isLoading, error, fetchPosts } = usePostsScreen();
+
+  return (
+    <SafeAreaView className="flex-1 bg-background">
+      <View className="flex-row items-center px-4 py-3 gap-3">
+        <Pressable onPress={() => router.back()} hitSlop={8}>
+          <Ionicons name="chevron-back" size={24} color={theme.foreground} />
+        </Pressable>
+        <Text className="text-xl font-semibold text-foreground">
+          {t("posts.title")}
+        </Text>
+      </View>
+
+      {isLoading ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color={theme.primary} />
+          <Text className="text-base text-muted mt-4">{t("posts.loading")}</Text>
+        </View>
+      ) : error ? (
+        <View className="flex-1 items-center justify-center px-6">
+          <Ionicons name="cloud-offline" size={48} color={theme.destructive} />
+          <Text className="text-base text-destructive mt-4">{t("posts.error")}</Text>
+          <Pressable
+            className="mt-4 bg-primary px-6 py-3 rounded-xl active:opacity-80"
+            onPress={fetchPosts}
+          >
+            <Text className="text-primary-foreground font-semibold">{t("posts.retry")}</Text>
+          </Pressable>
+        </View>
+      ) : posts.length === 0 ? (
+        <View className="flex-1 items-center justify-center">
+          <Text className="text-base text-muted">{t("posts.empty")}</Text>
+        </View>
+      ) : (
+        <FlashList
+          data={posts}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={({ item }) => (
+            <View className="mx-4 mb-3 p-4 bg-card rounded-2xl border border-border">
+              <Text className="text-base font-semibold text-foreground" numberOfLines={2}>
+                {item.title}
+              </Text>
+              <Text className="text-sm text-muted mt-2" numberOfLines={3}>
+                {item.body}
+              </Text>
+              <Text className="text-xs text-muted-foreground mt-3">
+                {t("posts.byUser", { id: item.userId })}
+              </Text>
+            </View>
+          )}
+          contentContainerClassName="pt-2 pb-4"
+        />
+      )}
+    </SafeAreaView>
+  );
+}
+`,
+    );
+
+    this.fs.write(
+      this.destinationPath("app/posts/index.hooks.tsx"),
+      `import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { useThemeColors } from "@/src/theme";
+import { useAppDispatch, useAppSelector } from "@/src/redux-store/hooks";
+import { selectors } from "@/src/redux-store/slices";
+import getPosts from "@/src/redux-store/extra-actions/apis/get-posts";
+
+export const usePostsScreen = () => {
+  const { t } = useTranslation();
+  const theme = useThemeColors();
+  const dispatch = useAppDispatch();
+
+  const posts = useAppSelector(selectors.getPostItems);
+  const isLoading = useAppSelector(selectors.getAjaxIsLoadingByApi(getPosts.api));
+  const error = useAppSelector(selectors.getPostsError);
+
+  const fetchPosts = () => {
+    dispatch(getPosts.request({}));
+  };
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  return { t, theme, posts, isLoading, error, fetchPosts };
+};
+`,
+    );
+  }
+
+  // ─── Posts Slice ───────────────────────────────────────
+
+  _writePostsSlice() {
+    const d = "src/redux-store/slices/posts";
+
+    this.fs.write(
+      this.destinationPath(\`\${d}/index.ts\`),
+      \`import { createSlice } from "@reduxjs/toolkit";
+import * as selectors from "./posts.selectors";
+import * as sagas from "./posts.sagas";
+import { PostsState } from "./posts.interfaces";
+import getPosts from "../../extra-actions/apis/get-posts";
+
+const initialState: PostsState = {
+  items: [],
+  error: null,
+};
+
+export const postsStore = createSlice({
+  name: "posts",
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(getPosts.request, (state) => {
+        state.error = null;
+      })
+      .addCase(getPosts.success, (state, action: any) => {
+        state.items = action.payload.data;
+        state.error = null;
+      })
+      .addCase(getPosts.fail, (state, action: any) => {
+        state.error = action.payload.message;
+      });
+  },
+});
+
+export { selectors, sagas };
+\`,
+    );
+
+    this.fs.write(
+      this.destinationPath(\`\${d}/posts.interfaces.ts\`),
+      \`export interface Post {
+  userId: number;
+  id: number;
+  title: string;
+  body: string;
+}
+
+export interface PostsState {
+  items: Post[];
+  error: string | null;
+}
+\`,
+    );
+
+    this.fs.write(
+      this.destinationPath(\`\${d}/posts.selectors.ts\`),
+      \`import { RootState } from "@/src/redux-store";
+
+export const getPosts = (state: RootState) => state?.posts;
+export const getPostItems = (state: RootState) => state?.posts?.items ?? [];
+export const getPostsError = (state: RootState) => state?.posts?.error ?? null;
+export const getPostCount = (state: RootState) => state?.posts?.items?.length ?? 0;
+\`,
+    );
+
+    this.fs.write(
+      this.destinationPath(\`\${d}/posts.sagas.ts\`),
+      \`export function* onPostsChanged() {
+  // Example saga — react to posts changes
+}
+\`,
     );
   }
 }

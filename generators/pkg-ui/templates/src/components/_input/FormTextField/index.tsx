@@ -1,8 +1,6 @@
-import { useState } from "react";
 import { Text, TextInput, TextInputProps, View } from "react-native";
-import { useFieldContext } from "@/src/components/_form";
 import { FieldErrors } from "@/src/components/_form/FieldErrors";
-import { useThemeColors } from "@/src/theme";
+import { useFormTextField } from "./index.hooks";
 
 type FormTextFieldProps = {
   label?: string;
@@ -14,10 +12,8 @@ export const FormTextField = ({
   placeholder,
   ...props
 }: FormTextFieldProps) => {
-  const field = useFieldContext<string>();
-  const [focused, setFocused] = useState(false);
-  const hasError = field.state.meta.isTouched && field.state.meta.errors.length > 0;
-  const theme = useThemeColors();
+  const { field, focused, hasError, theme, onFocus, onBlur, onChangeText } =
+    useFormTextField();
 
   return (
     <View className="gap-1.5">
@@ -39,12 +35,9 @@ export const FormTextField = ({
           placeholder={placeholder}
           placeholderTextColor={theme.mutedForeground}
           value={field.state.value ?? ""}
-          onChangeText={(text) => field.handleChange(text)}
-          onFocus={() => setFocused(true)}
-          onBlur={() => {
-            setFocused(false);
-            field.handleBlur();
-          }}
+          onChangeText={onChangeText}
+          onFocus={onFocus}
+          onBlur={onBlur}
           {...props}
         />
       </View>

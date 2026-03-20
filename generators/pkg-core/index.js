@@ -55,6 +55,7 @@ export default class PkgCoreGenerator extends Generator {
         zod: "^3.24.0",
         "@tanstack/react-query": "^5.85.0",
         axios: "^1.12.0",
+        qs: "^6.14.0",
       },
     });
 
@@ -155,10 +156,7 @@ export default function HomeScreen() {
     const dirs = [
       "src/components",
       "src/models",
-      "src/lib",
       "src/hooks",
-      "src/constants",
-      "src/services",
     ];
     for (const dir of dirs) {
       this.fs.write(

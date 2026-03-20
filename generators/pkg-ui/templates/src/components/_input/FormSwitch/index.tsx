@@ -1,7 +1,6 @@
 import { Platform, Switch, SwitchProps, Text, View } from "react-native";
-import { useFieldContext } from "@/src/components/_form";
 import { FieldErrors } from "@/src/components/_form/FieldErrors";
-import { useThemeColors } from "@/src/theme";
+import { useFormSwitch } from "./index.hooks";
 
 type FormSwitchProps = {
   label?: string;
@@ -13,8 +12,7 @@ export const FormSwitch = ({
   description,
   ...props
 }: FormSwitchProps) => {
-  const field = useFieldContext<boolean>();
-  const theme = useThemeColors();
+  const { field, theme, onValueChange } = useFormSwitch();
 
   return (
     <View className="gap-1">
@@ -31,7 +29,7 @@ export const FormSwitch = ({
         </View>
         <Switch
           value={field.state.value}
-          onValueChange={(value) => field.handleChange(value)}
+          onValueChange={onValueChange}
           trackColor={{ false: theme.switchTrack, true: theme.switchTrackActive }}
           thumbColor={Platform.OS === "android" ? theme.switchThumb : undefined}
           ios_backgroundColor={theme.switchTrack}

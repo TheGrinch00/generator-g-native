@@ -1,0 +1,73 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Try again",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back"
+  },
+  "tabs": {
+    "home": "Home",
+    "settings": "Settings"
+  },
+  "home": {
+    "title": "Home",
+    "subtitle": "Welcome to the demo app",
+    "counterCard": "Counter Demo",
+    "counterDescription": "Test Redux actions & selectors",
+    "formCard": "Contact Form",
+    "formDescription": "Test TanStack Form inputs",
+    "profileCard": "Profile",
+    "profileDescription": "Dynamic route example",
+    "postsCard": "API Posts",
+    "postsDescription": "Test Redux AJAX actions"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "darkMode": "Dark Mode",
+    "notifications": "Notifications",
+    "notificationsDescription": "Receive push notifications",
+    "version": "Version"
+  },
+  "counter": {
+    "title": "Counter",
+    "value": "Value: {{count}}",
+    "increment": "Increment",
+    "decrement": "Decrement",
+    "reset": "Reset"
+  },
+  "contact": {
+    "title": "New Contact",
+    "firstName": "First Name",
+    "firstNamePlaceholder": "Enter first name",
+    "lastName": "Last Name",
+    "lastNamePlaceholder": "Enter last name",
+    "email": "Email",
+    "emailPlaceholder": "name@example.com",
+    "phone": "Phone",
+    "phonePlaceholder": "+1 (555) 000-0000",
+    "category": "Category",
+    "newsletter": "Subscribe to newsletter",
+    "newsletterDescription": "Receive updates via email",
+    "submit": "Save Contact",
+    "success": "Contact saved!"
+  },
+  "profile": {
+    "title": "Profile",
+    "greeting": "Hello, {{name}}!"
+  },
+  "posts": {
+    "title": "Posts",
+    "subtitle": "Data from JSONPlaceholder API",
+    "loading": "Loading posts...",
+    "error": "Failed to load posts",
+    "empty": "No posts found",
+    "retry": "Retry",
+    "byUser": "User {{id}}"
+  }
+}

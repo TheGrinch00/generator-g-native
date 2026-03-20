@@ -1,0 +1,73 @@
+{
+  "common": {
+    "loading": "Caricamento...",
+    "error": "Si è verificato un errore",
+    "retry": "Riprova",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "confirm": "Conferma",
+    "delete": "Elimina",
+    "edit": "Modifica",
+    "back": "Indietro"
+  },
+  "tabs": {
+    "home": "Home",
+    "settings": "Impostazioni"
+  },
+  "home": {
+    "title": "Home",
+    "subtitle": "Benvenuto nella demo app",
+    "counterCard": "Demo Contatore",
+    "counterDescription": "Testa azioni e selettori Redux",
+    "formCard": "Form Contatto",
+    "formDescription": "Testa gli input di TanStack Form",
+    "profileCard": "Profilo",
+    "profileDescription": "Esempio di rotta dinamica",
+    "postsCard": "Post API",
+    "postsDescription": "Testa le azioni AJAX Redux"
+  },
+  "settings": {
+    "title": "Impostazioni",
+    "language": "Lingua",
+    "darkMode": "Modalità Scura",
+    "notifications": "Notifiche",
+    "notificationsDescription": "Ricevi notifiche push",
+    "version": "Versione"
+  },
+  "counter": {
+    "title": "Contatore",
+    "value": "Valore: {{count}}",
+    "increment": "Incrementa",
+    "decrement": "Decrementa",
+    "reset": "Resetta"
+  },
+  "contact": {
+    "title": "Nuovo Contatto",
+    "firstName": "Nome",
+    "firstNamePlaceholder": "Inserisci il nome",
+    "lastName": "Cognome",
+    "lastNamePlaceholder": "Inserisci il cognome",
+    "email": "Email",
+    "emailPlaceholder": "nome@esempio.com",
+    "phone": "Telefono",
+    "phonePlaceholder": "+39 333 000 0000",
+    "category": "Categoria",
+    "newsletter": "Iscriviti alla newsletter",
+    "newsletterDescription": "Ricevi aggiornamenti via email",
+    "submit": "Salva Contatto",
+    "success": "Contatto salvato!"
+  },
+  "profile": {
+    "title": "Profilo",
+    "greeting": "Ciao, {{name}}!"
+  },
+  "posts": {
+    "title": "Post",
+    "subtitle": "Dati dall'API JSONPlaceholder",
+    "loading": "Caricamento post...",
+    "error": "Impossibile caricare i post",
+    "empty": "Nessun post trovato",
+    "retry": "Riprova",
+    "byUser": "Utente {{id}}"
+  }
+}

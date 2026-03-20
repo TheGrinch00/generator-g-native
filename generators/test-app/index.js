@@ -1,9 +1,19 @@
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import Generator from "yeoman-generator";
 import chalk from "chalk";
 import yosay from "yosay";
-import { extendConfigFile } from "../../common/index.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+function dirname(p) {
+  return path.dirname(p);
+}
+
+function sibling(generatorName) {
+  return path.resolve(__dirname, "..", generatorName, "templates");
+}
 
 export default class TestAppGenerator extends Generator {
   async prompting() {
@@ -32,25 +42,190 @@ export default class TestAppGenerator extends Generator {
     }
   }
 
-  async configuring() {
+  writing() {
     if (this.abort) return;
 
-    // Run all package generators in order
-    const generators = [
-      "@thegrinch00/g-native:pkg-core",
-      "@thegrinch00/g-native:pkg-ui",
-      "@thegrinch00/g-native:pkg-redux",
-      "@thegrinch00/g-native:pkg-translations",
-    ];
+    this._writePkgCore();
+    this._writePkgUi();
+    this._writePkgRedux();
+    this._writePkgTranslations();
+    this._writeTestAppScreens();
+  }
 
-    for (const gen of generators) {
-      this.log(chalk.cyan(`\n▸ Running ${gen}...\n`));
-      await this.composeWith(gen, { skipPrompts: true });
+  async install() {
+    if (this.abort) return;
+
+    const run = (cmd, args) =>
+      new Promise((resolve, reject) => {
+        const child = this.spawnCommand(cmd, args, { stdio: "inherit" });
+        child.on("exit", (code) =>
+          code === 0 ? resolve() : reject(new Error(`${cmd} exited with ${code}`)),
+        );
+        child.on("error", reject);
+      });
+
+    try {
+      // All expo-managed packages in one call
+      await run("npx", [
+        "expo", "install",
+        "expo-router",
+        "expo-linking",
+        "expo-constants",
+        "expo-localization",
+        "react-native-screens",
+        "react-native-safe-area-context",
+        "react-native-gesture-handler",
+        "react-native-reanimated",
+        "react-native-worklets",
+        "react-dom",
+        "@expo/metro-runtime",
+        "@react-native-async-storage/async-storage",
+      ]);
+    } catch (err) {
+      this.log("\n❌ Dependencies installation failed:", err?.message || err);
+      throw err;
     }
   }
 
-  writing() {
-    if (this.abort) return;
+  // ─── pkg-core (inline) ────────────────────────────────────
+
+  _writePkgCore() {
+    this.packageJson.merge({
+      main: "expo-router/entry",
+      scripts: {
+        lint: "eslint .",
+        tsc: "tsc --noEmit",
+        test: "jest --runInBand",
+      },
+      devDependencies: {
+        "@types/jest": "^29.5.0",
+        "eslint-config-prettier": "^9.1.0",
+        husky: "^9.1.0",
+        jest: "^29.7.0",
+        "lint-staged": "^15.2.0",
+        prettier: "^3.6.0",
+        "ts-jest": "^29.2.0",
+      },
+      dependencies: {
+        zod: "^3.24.0",
+        "@tanstack/react-query": "^5.85.0",
+        axios: "^1.12.0",
+      },
+    });
+
+    // Update app.json
+    const appJsonPath = this.destinationPath("app.json");
+    if (fs.existsSync(appJsonPath)) {
+      const appJson = this.fs.readJSON(appJsonPath);
+      appJson.expo = appJson.expo || {};
+      appJson.expo.scheme = appJson.expo.scheme || appJson.expo.slug || "app";
+      appJson.expo.plugins = appJson.expo.plugins || [];
+      if (!appJson.expo.plugins.includes("expo-router")) {
+        appJson.expo.plugins.push("expo-router");
+      }
+      this.fs.writeJSON(appJsonPath, appJson);
+    }
+
+    // Remove old entry points
+    for (const file of ["index.ts", "index.js", "App.tsx", "App.js"]) {
+      const filePath = this.destinationPath(file);
+      if (fs.existsSync(filePath)) {
+        this.fs.delete(filePath);
+      }
+    }
+
+    // .npmrc
+    this.fs.write(this.destinationPath(".npmrc"), "legacy-peer-deps=true\n");
+
+    // Copy dotfiles from pkg-core templates
+    this.fs.copy(path.join(sibling("pkg-core"), ".*"), this.destinationRoot());
+
+    // Create src directories
+    const dirs = [
+      "src/components",
+      "src/models",
+      "src/lib",
+      "src/hooks",
+      "src/constants",
+      "src/services",
+    ];
+    for (const dir of dirs) {
+      this.fs.write(this.destinationPath(`${dir}/.gitkeep`), "");
+    }
+  }
+
+  // ─── pkg-ui (inline) ──────────────────────────────────────
+
+  _writePkgUi() {
+    this.packageJson.merge({
+      dependencies: {
+        nativewind: "^4.1.0",
+        "@tanstack/react-form": "^1.11.0",
+        "lucide-react-native": "^0.511.0",
+      },
+      devDependencies: {
+        tailwindcss: "^3.4.0",
+      },
+    });
+
+    // Copy all pkg-ui templates (non-dotfiles)
+    this.fs.copy(path.join(sibling("pkg-ui"), "**"), this.destinationPath("."));
+
+    // global.css
+    this.fs.write(
+      this.destinationPath("global.css"),
+      "@tailwind base;\n@tailwind components;\n@tailwind utilities;\n",
+    );
+  }
+
+  // ─── pkg-redux (inline) ───────────────────────────────────
+
+  _writePkgRedux() {
+    this.packageJson.merge({
+      dependencies: {
+        "@reduxjs/toolkit": "^2.9.0",
+        "react-redux": "^9.2.0",
+        "redux-persist": "^6.0.0",
+        "redux-saga": "^1.3.0",
+      },
+    });
+
+    // Copy redux store templates
+    this.fs.copy(
+      path.join(sibling("pkg-redux"), "**"),
+      this.destinationPath("."),
+    );
+  }
+
+  // ─── pkg-translations (inline) ────────────────────────────
+
+  _writePkgTranslations() {
+    this.packageJson.merge({
+      dependencies: {
+        i18next: "^24.2.0",
+        "react-i18next": "^15.4.0",
+      },
+    });
+
+    // Copy i18n template (will be overwritten by test app translations below)
+    this.fs.copy(
+      path.join(sibling("pkg-translations"), "**"),
+      this.destinationPath("."),
+    );
+  }
+
+  // ─── Test App Screens & Demo Content ──────────────────────
+
+  _writeTestAppScreens() {
+    // .genyg.json with all packages enabled
+    this.fs.writeJSON(this.destinationPath(".genyg.json"), {
+      packages: {
+        core: true,
+        ui: true,
+        redux: true,
+        translations: true,
+      },
+    });
 
     this._writeTranslations();
     this._writeRootLayout();
@@ -62,6 +237,7 @@ export default class TestAppGenerator extends Generator {
     this._writeCounterScreen();
     this._writeCounterSlice();
     this._writeContactsSlice();
+    this._writeSlicesIndex();
     this._writeContactModel();
   }
 
@@ -195,7 +371,7 @@ export default class TestAppGenerator extends Generator {
     });
   }
 
-  // ─── Root Layout (wraps with StoreProvider + i18n) ─────────
+  // ─── Root Layout ──────────────────────────────────────────
 
   _writeRootLayout() {
     this.fs.write(
@@ -220,7 +396,7 @@ export default function RootLayout() {
     );
   }
 
-  // ─── Tabs Layout ───────────────────────────────────────────
+  // ─── Tabs Layout ──────────────────────────────────────────
 
   _writeTabsLayout() {
     this.fs.write(
@@ -272,7 +448,7 @@ export default function TabsLayout() {
     );
   }
 
-  // ─── Home Screen ───────────────────────────────────────────
+  // ─── Home Screen ──────────────────────────────────────────
 
   _writeHomeScreen() {
     this.fs.write(
@@ -352,7 +528,7 @@ function NavCard({
     );
   }
 
-  // ─── Settings Screen ───────────────────────────────────────
+  // ─── Settings Screen ──────────────────────────────────────
 
   _writeSettingsScreen() {
     this.fs.write(
@@ -462,7 +638,7 @@ function SettingRow({
     );
   }
 
-  // ─── Profile (dynamic route) ───────────────────────────────
+  // ─── Profile (dynamic route) ──────────────────────────────
 
   _writeProfileScreen() {
     this.fs.write(
@@ -509,7 +685,7 @@ export default function ProfileScreen() {
   _writeContactFormScreen() {
     this.fs.write(
       this.destinationPath("app/contact/index.tsx"),
-      `import { View, Text, Pressable, ScrollView, Alert } from "react-native";
+      `import { View, Text, Pressable, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -671,7 +847,7 @@ export const useContactForm = () => {
     );
   }
 
-  // ─── Counter Screen (Redux demo) ──────────────────────────
+  // ─── Counter Screen ───────────────────────────────────────
 
   _writeCounterScreen() {
     this.fs.write(
@@ -737,13 +913,13 @@ export default function CounterScreen() {
     );
   }
 
-  // ─── Counter Slice ─────────────────────────────────────────
+  // ─── Counter Slice ────────────────────────────────────────
 
   _writeCounterSlice() {
-    const sliceDir = "src/redux-store/slices/counter";
+    const d = "src/redux-store/slices/counter";
 
     this.fs.write(
-      this.destinationPath(`${sliceDir}/index.ts`),
+      this.destinationPath(`${d}/index.ts`),
       `import { createSlice } from "@reduxjs/toolkit";
 import * as selectors from "./counter.selectors";
 import * as sagas from "./counter.sagas";
@@ -774,7 +950,7 @@ export { selectors, sagas };
     );
 
     this.fs.write(
-      this.destinationPath(`${sliceDir}/counter.interfaces.ts`),
+      this.destinationPath(`${d}/counter.interfaces.ts`),
       `export interface CounterState {
   count: number;
 }
@@ -782,7 +958,7 @@ export { selectors, sagas };
     );
 
     this.fs.write(
-      this.destinationPath(`${sliceDir}/counter.selectors.ts`),
+      this.destinationPath(`${d}/counter.selectors.ts`),
       `import { RootState } from "@/src/redux-store";
 
 export const getCounter = (state: RootState) => state?.counter;
@@ -791,57 +967,21 @@ export const getCount = (state: RootState) => state?.counter?.count ?? 0;
     );
 
     this.fs.write(
-      this.destinationPath(`${sliceDir}/counter.sagas.ts`),
+      this.destinationPath(`${d}/counter.sagas.ts`),
       `export function* onCounterChanged() {
   // Example saga — react to counter changes
 }
 `,
     );
-
-    // Update slices index to include counter
-    this.fs.write(
-      this.destinationPath("src/redux-store/slices/index.ts"),
-      `// Auto-generated by GeNYG Native
-import { combineReducers } from "@reduxjs/toolkit";
-
-import * as ui from "./ui";
-import * as counter from "./counter";
-import * as contacts from "./contacts";
-
-export const reducers = {
-  ui: ui.uiStore.reducer,
-  counter: counter.counterStore.reducer,
-  contacts: contacts.contactsStore.reducer,
-};
-
-export const actions = {
-  ...ui.uiStore.actions,
-  ...counter.counterStore.actions,
-  ...contacts.contactsStore.actions,
-};
-
-export const selectors = {
-  ...ui.selectors,
-  ...counter.selectors,
-  ...contacts.selectors,
-};
-
-export const sagas = [
-  ...Object.values(ui.sagas),
-  ...Object.values(counter.sagas),
-  ...Object.values(contacts.sagas),
-];
-`,
-    );
   }
 
-  // ─── Contacts Slice ────────────────────────────────────────
+  // ─── Contacts Slice ───────────────────────────────────────
 
   _writeContactsSlice() {
-    const sliceDir = "src/redux-store/slices/contacts";
+    const d = "src/redux-store/slices/contacts";
 
     this.fs.write(
-      this.destinationPath(`${sliceDir}/index.ts`),
+      this.destinationPath(`${d}/index.ts`),
       `import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import * as selectors from "./contacts.selectors";
 import * as sagas from "./contacts.sagas";
@@ -872,7 +1012,7 @@ export { selectors, sagas };
     );
 
     this.fs.write(
-      this.destinationPath(`${sliceDir}/contacts.interfaces.ts`),
+      this.destinationPath(`${d}/contacts.interfaces.ts`),
       `export interface Contact {
   id: string;
   firstName: string;
@@ -890,7 +1030,7 @@ export interface ContactsState {
     );
 
     this.fs.write(
-      this.destinationPath(`${sliceDir}/contacts.selectors.ts`),
+      this.destinationPath(`${d}/contacts.selectors.ts`),
       `import { RootState } from "@/src/redux-store";
 
 export const getContacts = (state: RootState) => state?.contacts;
@@ -900,10 +1040,47 @@ export const getContactCount = (state: RootState) => state?.contacts?.items?.len
     );
 
     this.fs.write(
-      this.destinationPath(`${sliceDir}/contacts.sagas.ts`),
+      this.destinationPath(`${d}/contacts.sagas.ts`),
       `export function* onContactAdded() {
   // Example saga — react to contact additions
 }
+`,
+    );
+  }
+
+  // ─── Slices Index (overrides pkg-redux default) ───────────
+
+  _writeSlicesIndex() {
+    this.fs.write(
+      this.destinationPath("src/redux-store/slices/index.ts"),
+      `// Auto-generated by GeNYG Native test-app
+import * as ui from "./ui";
+import * as counter from "./counter";
+import * as contacts from "./contacts";
+
+export const reducers = {
+  ui: ui.uiStore.reducer,
+  counter: counter.counterStore.reducer,
+  contacts: contacts.contactsStore.reducer,
+};
+
+export const actions = {
+  ...ui.uiStore.actions,
+  ...counter.counterStore.actions,
+  ...contacts.contactsStore.actions,
+};
+
+export const selectors = {
+  ...ui.selectors,
+  ...counter.selectors,
+  ...contacts.selectors,
+};
+
+export const sagas = [
+  ...Object.values(ui.sagas),
+  ...Object.values(counter.sagas),
+  ...Object.values(contacts.sagas),
+];
 `,
     );
   }

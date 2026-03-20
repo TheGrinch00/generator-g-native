@@ -71,7 +71,6 @@ export const FormSelect = ({ label, placeholder, options }: FormSelectProps) => 
             <FlashList
               data={options}
               keyExtractor={(item) => String(item.value)}
-              estimatedItemSize={56}
               renderItem={({ item }) => {
                 const isSelected = item.value === field.state.value;
                 return (

@@ -54,7 +54,7 @@ export default class PkgUiGenerator extends Generator {
       },
       devDependencies: {
         tailwindcss: "^3.4.0",
-        "babel-preset-expo": "^13.0.0",
+        "babel-preset-expo": "~55.0.8",
       },
     });
 

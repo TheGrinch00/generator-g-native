@@ -24,25 +24,30 @@ export const FormTextField = ({
       {label && (
         <Text className="text-sm font-medium text-muted">{label}</Text>
       )}
-      <TextInput
-        className={`bg-input rounded-xl px-4 h-12 text-base text-foreground ${
+      <View
+        className={`bg-input rounded-xl px-4 h-12 justify-center ${
           focused
             ? "border-2 border-primary"
             : hasError
               ? "border-2 border-destructive"
               : "border border-border"
         }`}
-        placeholder={placeholder}
-        placeholderTextColor={theme.mutedForeground}
-        value={field.state.value ?? ""}
-        onChangeText={(text) => field.handleChange(text)}
-        onFocus={() => setFocused(true)}
-        onBlur={() => {
-          setFocused(false);
-          field.handleBlur();
-        }}
-        {...props}
-      />
+      >
+        <TextInput
+          className="flex-1 text-foreground"
+          style={{ fontSize: 16, textAlignVertical: "center" }}
+          placeholder={placeholder}
+          placeholderTextColor={theme.mutedForeground}
+          value={field.state.value ?? ""}
+          onChangeText={(text) => field.handleChange(text)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => {
+            setFocused(false);
+            field.handleBlur();
+          }}
+          {...props}
+        />
+      </View>
       <FieldErrors meta={field.state.meta} />
     </View>
   );

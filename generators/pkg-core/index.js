@@ -44,6 +44,7 @@ export default class PkgCoreGenerator extends Generator {
       },
       devDependencies: {
         "@types/jest": "^29.5.0",
+        "@types/qs": "^6.14.0",
         "eslint-config-prettier": "^9.1.0",
         husky: "^9.1.0",
         jest: "^29.7.0",

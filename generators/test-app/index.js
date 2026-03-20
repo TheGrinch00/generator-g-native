@@ -101,6 +101,7 @@ export default class TestAppGenerator extends Generator {
       },
       devDependencies: {
         "@types/jest": "^29.5.0",
+        "@types/qs": "^6.14.0",
         "eslint-config-prettier": "^9.1.0",
         husky: "^9.1.0",
         jest: "^29.7.0",
@@ -1564,8 +1565,8 @@ export const usePostsScreen = () => {
     const d = "src/redux-store/slices/posts";
 
     this.fs.write(
-      this.destinationPath(\`\${d}/index.ts\`),
-      \`import { createSlice } from "@reduxjs/toolkit";
+      this.destinationPath(`${d}/index.ts`),
+      `import { createSlice } from "@reduxjs/toolkit";
 import * as selectors from "./posts.selectors";
 import * as sagas from "./posts.sagas";
 import { PostsState } from "./posts.interfaces";
@@ -1596,12 +1597,12 @@ export const postsStore = createSlice({
 });
 
 export { selectors, sagas };
-\`,
+`,
     );
 
     this.fs.write(
-      this.destinationPath(\`\${d}/posts.interfaces.ts\`),
-      \`export interface Post {
+      this.destinationPath(`${d}/posts.interfaces.ts`),
+      `export interface Post {
   userId: number;
   id: number;
   title: string;
@@ -1612,26 +1613,26 @@ export interface PostsState {
   items: Post[];
   error: string | null;
 }
-\`,
+`,
     );
 
     this.fs.write(
-      this.destinationPath(\`\${d}/posts.selectors.ts\`),
-      \`import { RootState } from "@/src/redux-store";
+      this.destinationPath(`${d}/posts.selectors.ts`),
+      `import { RootState } from "@/src/redux-store";
 
 export const getPosts = (state: RootState) => state?.posts;
 export const getPostItems = (state: RootState) => state?.posts?.items ?? [];
 export const getPostsError = (state: RootState) => state?.posts?.error ?? null;
 export const getPostCount = (state: RootState) => state?.posts?.items?.length ?? 0;
-\`,
+`,
     );
 
     this.fs.write(
-      this.destinationPath(\`\${d}/posts.sagas.ts\`),
-      \`export function* onPostsChanged() {
+      this.destinationPath(`${d}/posts.sagas.ts`),
+      `export function* onPostsChanged() {
   // Example saga — react to posts changes
 }
-\`,
+`,
     );
   }
 }

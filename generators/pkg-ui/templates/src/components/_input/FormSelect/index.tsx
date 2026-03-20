@@ -9,6 +9,7 @@ import {
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useFieldContext } from "@/src/components/_form";
 import { FieldErrors } from "@/src/components/_form/FieldErrors";
+import { useThemeColors } from "@/src/theme";
 
 type FormSelectOption = {
   value: string | number;
@@ -25,31 +26,32 @@ export const FormSelect = ({ label, placeholder, options }: FormSelectProps) => 
   const field = useFieldContext<string | number | null>();
   const [visible, setVisible] = useState(false);
   const hasError = field.state.meta.isTouched && field.state.meta.errors.length > 0;
+  const theme = useThemeColors();
 
   const selectedOption = options.find((o) => o.value === field.state.value);
 
   return (
     <View className="gap-1.5">
       {label && (
-        <Text className="text-sm font-medium text-gray-700">{label}</Text>
+        <Text className="text-sm font-medium text-muted">{label}</Text>
       )}
 
       <Pressable
-        className={`flex-row items-center justify-between bg-gray-50 rounded-xl px-4 h-12 ${
-          hasError ? "border-2 border-red-400" : "border border-gray-200"
+        className={`flex-row items-center justify-between bg-input rounded-xl px-4 h-12 ${
+          hasError ? "border-2 border-destructive" : "border border-border"
         }`}
         onPress={() => setVisible(true)}
       >
         <Text
           className={
             selectedOption
-              ? "text-base text-gray-900"
-              : "text-base text-gray-400"
+              ? "text-base text-foreground"
+              : "text-base text-muted-foreground"
           }
         >
           {selectedOption?.label ?? placeholder ?? "Select..."}
         </Text>
-        <Ionicons name="chevron-down" size={20} color="#9ca3af" />
+        <Ionicons name="chevron-down" size={20} color={theme.mutedForeground} />
       </Pressable>
 
       <Modal visible={visible} transparent animationType="fade">
@@ -58,15 +60,15 @@ export const FormSelect = ({ label, placeholder, options }: FormSelectProps) => 
           onPress={() => setVisible(false)}
         >
           <Pressable
-            className="bg-white rounded-t-3xl max-h-[60%]"
+            className="bg-background rounded-t-3xl max-h-[60%]"
             onPress={(e) => e.stopPropagation()}
           >
             <View className="items-center pt-3 pb-1">
-              <View className="w-10 h-1 rounded-full bg-gray-300" />
+              <View className="w-10 h-1 rounded-full bg-border" />
             </View>
 
             <View className="px-5 py-4">
-              <Text className="text-lg font-semibold text-gray-900">
+              <Text className="text-lg font-semibold text-foreground">
                 {label ?? placeholder ?? "Select an option"}
               </Text>
             </View>
@@ -79,7 +81,7 @@ export const FormSelect = ({ label, placeholder, options }: FormSelectProps) => 
                 return (
                   <Pressable
                     className={`flex-row items-center justify-between px-5 py-4 ${
-                      isSelected ? "bg-blue-50" : "active:bg-gray-50"
+                      isSelected ? "bg-primary/10" : "active:bg-card"
                     }`}
                     onPress={() => {
                       field.handleChange(item.value);
@@ -89,18 +91,18 @@ export const FormSelect = ({ label, placeholder, options }: FormSelectProps) => 
                     <Text
                       className={`text-base ${
                         isSelected
-                          ? "text-blue-600 font-semibold"
-                          : "text-gray-900"
+                          ? "text-primary font-semibold"
+                          : "text-foreground"
                       }`}
                     >
                       {item.label}
                     </Text>
-                    {isSelected && <Ionicons name="checkmark" size={20} color="#2563eb" />}
+                    {isSelected && <Ionicons name="checkmark" size={20} color={theme.primary} />}
                   </Pressable>
                 );
               }}
               ItemSeparatorComponent={() => (
-                <View className="h-px bg-gray-100 mx-5" />
+                <View className="h-px bg-border/50 mx-5" />
               )}
             />
 

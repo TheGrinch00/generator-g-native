@@ -14,7 +14,7 @@ export const FieldErrors = ({ meta }: FieldErrorsProps) => {
   return (
     <View className="px-1">
       {meta.errors.map(({ message }: ZodError, index: number) => (
-        <Text key={index} className="text-red-500 text-xs font-medium mt-1">
+        <Text key={index} className="text-destructive text-xs font-medium mt-1">
           {message}
         </Text>
       ))}

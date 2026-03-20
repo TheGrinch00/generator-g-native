@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Text, TextInput, TextInputProps, View } from "react-native";
 import { useFieldContext } from "@/src/components/_form";
 import { FieldErrors } from "@/src/components/_form/FieldErrors";
+import { useThemeColors } from "@/src/theme";
 
 type FormTextFieldProps = {
   label?: string;
@@ -16,22 +17,23 @@ export const FormTextField = ({
   const field = useFieldContext<string>();
   const [focused, setFocused] = useState(false);
   const hasError = field.state.meta.isTouched && field.state.meta.errors.length > 0;
+  const theme = useThemeColors();
 
   return (
     <View className="gap-1.5">
       {label && (
-        <Text className="text-sm font-medium text-gray-700">{label}</Text>
+        <Text className="text-sm font-medium text-muted">{label}</Text>
       )}
       <TextInput
-        className={`bg-gray-50 rounded-xl px-4 h-12 text-base text-gray-900 ${
+        className={`bg-input rounded-xl px-4 h-12 text-base text-foreground ${
           focused
-            ? "border-2 border-blue-500"
+            ? "border-2 border-primary"
             : hasError
-              ? "border-2 border-red-400"
-              : "border border-gray-200"
+              ? "border-2 border-destructive"
+              : "border border-border"
         }`}
         placeholder={placeholder}
-        placeholderTextColor="#9ca3af"
+        placeholderTextColor={theme.mutedForeground}
         value={field.state.value ?? ""}
         onChangeText={(text) => field.handleChange(text)}
         onFocus={() => setFocused(true)}

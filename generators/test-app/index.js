@@ -185,10 +185,47 @@ export default class TestAppGenerator extends Generator {
     // Copy all pkg-ui templates (non-dotfiles)
     this.fs.copy(path.join(sibling("pkg-ui"), "**"), this.destinationPath("."));
 
-    // global.css
+    // global.css with theme CSS variables
     this.fs.write(
       this.destinationPath("global.css"),
-      "@tailwind base;\n@tailwind components;\n@tailwind utilities;\n",
+      `@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-primary: 37 99 235;
+    --color-primary-foreground: 255 255 255;
+    --color-secondary: 139 92 246;
+    --color-accent: 245 158 11;
+    --color-destructive: 239 68 68;
+    --color-success: 34 197 94;
+    --color-background: 255 255 255;
+    --color-foreground: 17 24 39;
+    --color-muted: 107 114 128;
+    --color-muted-foreground: 156 163 175;
+    --color-border: 229 231 235;
+    --color-input: 249 250 251;
+    --color-card: 249 250 251;
+  }
+
+  .dark {
+    --color-primary: 59 130 246;
+    --color-primary-foreground: 255 255 255;
+    --color-secondary: 167 139 250;
+    --color-accent: 251 191 36;
+    --color-destructive: 248 113 113;
+    --color-success: 74 222 128;
+    --color-background: 15 23 42;
+    --color-foreground: 248 250 252;
+    --color-muted: 148 163 184;
+    --color-muted-foreground: 100 116 139;
+    --color-border: 30 41 59;
+    --color-input: 30 41 59;
+    --color-card: 30 41 59;
+  }
+}
+`,
     );
   }
 
@@ -394,14 +431,17 @@ export default class TestAppGenerator extends Generator {
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { useColorScheme } from "nativewind";
 import { StoreProvider } from "@/src/redux-store/StoreProvider";
 import "@/src/i18n";
 
 export default function RootLayout() {
+  const { colorScheme } = useColorScheme();
+
   return (
     <StoreProvider>
       <SafeAreaProvider>
-        <StatusBar style="dark" />
+        <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
         <Stack screenOptions={{ headerShown: false }} />
       </SafeAreaProvider>
     </StoreProvider>
@@ -419,18 +459,22 @@ export default function RootLayout() {
       `import { Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
+import { useThemeColors } from "@/src/theme";
 
 export default function TabsLayout() {
   const { t } = useTranslation();
+  const theme = useThemeColors();
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#2563eb",
-        tabBarInactiveTintColor: "#9ca3af",
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.mutedForeground,
         tabBarStyle: {
-          borderTopWidth: 0,
+          backgroundColor: theme.background,
+          borderTopColor: theme.border,
+          borderTopWidth: 1,
           elevation: 0,
           shadowOpacity: 0,
         },
@@ -473,35 +517,37 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useThemeColors } from "@/src/theme";
 
 export default function HomeScreen() {
   const { t } = useTranslation();
+  const theme = useThemeColors();
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-background">
       <ScrollView className="flex-1" contentContainerClassName="px-6 pt-8 pb-6">
-        <Text className="text-3xl font-bold tracking-tight text-gray-900">
+        <Text className="text-3xl font-bold tracking-tight text-foreground">
           {t("home.title")}
         </Text>
-        <Text className="text-base text-gray-500 mt-1">
+        <Text className="text-base text-muted mt-1">
           {t("home.subtitle")}
         </Text>
 
         <View className="mt-8 gap-3">
           <NavCard
-            icon={<Ionicons name="keypad" size={22} color="#2563eb" />}
+            icon={<Ionicons name="keypad" size={22} color={theme.primary} />}
             title={t("home.counterCard")}
             description={t("home.counterDescription")}
             onPress={() => router.push("/counter")}
           />
           <NavCard
-            icon={<Ionicons name="mail" size={22} color="#8b5cf6" />}
+            icon={<Ionicons name="mail" size={22} color={theme.secondary} />}
             title={t("home.formCard")}
             description={t("home.formDescription")}
             onPress={() => router.push("/contact")}
           />
           <NavCard
-            icon={<Ionicons name="person" size={22} color="#f59e0b" />}
+            icon={<Ionicons name="person" size={22} color={theme.accent} />}
             title={t("home.profileCard")}
             description={t("home.profileDescription")}
             onPress={() => router.push("/profile/demo-user")}
@@ -523,19 +569,21 @@ function NavCard({
   description: string;
   onPress: () => void;
 }) {
+  const theme = useThemeColors();
+
   return (
     <Pressable
-      className="flex-row items-center bg-gray-50 rounded-2xl p-4 border border-gray-100 active:bg-gray-100"
+      className="flex-row items-center bg-card rounded-2xl p-4 border border-border active:opacity-80"
       onPress={onPress}
     >
-      <View className="w-11 h-11 rounded-xl bg-white items-center justify-center border border-gray-200">
+      <View className="w-11 h-11 rounded-xl bg-background items-center justify-center border border-border">
         {icon}
       </View>
       <View className="flex-1 ml-3">
-        <Text className="text-base font-semibold text-gray-900">{title}</Text>
-        <Text className="text-sm text-gray-500 mt-0.5">{description}</Text>
+        <Text className="text-base font-semibold text-foreground">{title}</Text>
+        <Text className="text-sm text-muted mt-0.5">{description}</Text>
       </View>
-      <Ionicons name="chevron-forward" size={20} color="#d1d5db" />
+      <Ionicons name="chevron-forward" size={20} color={theme.border} />
     </Pressable>
   );
 }
@@ -550,73 +598,76 @@ function NavCard({
       this.destinationPath("app/(tabs)/settings.tsx"),
       `import { View, Text, Pressable, Switch, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useColorScheme } from "nativewind";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useThemeColors } from "@/src/theme";
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
-  const [darkMode, setDarkMode] = useState(false);
+  const { colorScheme, toggleColorScheme } = useColorScheme();
   const [notifications, setNotifications] = useState(true);
+  const theme = useThemeColors();
 
   const toggleLanguage = () => {
     i18n.changeLanguage(i18n.language === "en" ? "it" : "en");
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-background">
       <View className="flex-1 px-6 pt-8">
-        <Text className="text-3xl font-bold tracking-tight text-gray-900">
+        <Text className="text-3xl font-bold tracking-tight text-foreground">
           {t("settings.title")}
         </Text>
 
         <View className="mt-8 gap-1">
           <SettingRow
-            icon={<Ionicons name="globe" size={20} color="#2563eb" />}
+            icon={<Ionicons name="globe" size={20} color={theme.primary} />}
             label={t("settings.language")}
             right={
               <Pressable
                 onPress={toggleLanguage}
-                className="bg-blue-50 px-3 py-1.5 rounded-lg active:bg-blue-100"
+                className="bg-primary/10 px-3 py-1.5 rounded-lg active:bg-primary/20"
               >
-                <Text className="text-blue-600 font-semibold text-sm">
+                <Text className="text-primary font-semibold text-sm">
                   {i18n.language.toUpperCase()}
                 </Text>
               </Pressable>
             }
           />
           <SettingRow
-            icon={<Ionicons name="moon" size={20} color="#8b5cf6" />}
+            icon={<Ionicons name="moon" size={20} color={theme.secondary} />}
             label={t("settings.darkMode")}
             right={
               <Switch
-                value={darkMode}
-                onValueChange={setDarkMode}
-                trackColor={{ false: "#e5e7eb", true: "#3b82f6" }}
-                thumbColor={Platform.OS === "android" ? "#fff" : undefined}
-                ios_backgroundColor="#e5e7eb"
+                value={colorScheme === "dark"}
+                onValueChange={toggleColorScheme}
+                trackColor={{ false: theme.switchTrack, true: theme.switchTrackActive }}
+                thumbColor={Platform.OS === "android" ? theme.switchThumb : undefined}
+                ios_backgroundColor={theme.switchTrack}
               />
             }
           />
           <SettingRow
-            icon={<Ionicons name="notifications" size={20} color="#f59e0b" />}
+            icon={<Ionicons name="notifications" size={20} color={theme.accent} />}
             label={t("settings.notifications")}
             description={t("settings.notificationsDescription")}
             right={
               <Switch
                 value={notifications}
                 onValueChange={setNotifications}
-                trackColor={{ false: "#e5e7eb", true: "#3b82f6" }}
-                thumbColor={Platform.OS === "android" ? "#fff" : undefined}
-                ios_backgroundColor="#e5e7eb"
+                trackColor={{ false: theme.switchTrack, true: theme.switchTrackActive }}
+                thumbColor={Platform.OS === "android" ? theme.switchThumb : undefined}
+                ios_backgroundColor={theme.switchTrack}
               />
             }
           />
           <SettingRow
-            icon={<Ionicons name="information-circle" size={20} color="#6b7280" />}
+            icon={<Ionicons name="information-circle" size={20} color={theme.muted} />}
             label={t("settings.version")}
             right={
-              <Text className="text-sm text-gray-400">1.0.0</Text>
+              <Text className="text-sm text-muted-foreground">1.0.0</Text>
             }
           />
         </View>
@@ -637,13 +688,13 @@ function SettingRow({
   right: React.ReactNode;
 }) {
   return (
-    <View className="flex-row items-center justify-between py-4 border-b border-gray-100">
+    <View className="flex-row items-center justify-between py-4 border-b border-border">
       <View className="flex-row items-center flex-1 mr-3">
         {icon}
         <View className="ml-3">
-          <Text className="text-base text-gray-900">{label}</Text>
+          <Text className="text-base text-foreground">{label}</Text>
           {description && (
-            <Text className="text-xs text-gray-400 mt-0.5">{description}</Text>
+            <Text className="text-xs text-muted-foreground mt-0.5">{description}</Text>
           )}
         </View>
       </View>
@@ -665,28 +716,30 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useThemeColors } from "@/src/theme";
 
 export default function ProfileScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { t } = useTranslation();
+  const theme = useThemeColors();
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-background">
       <View className="flex-row items-center px-4 py-3 gap-3">
         <Pressable onPress={() => router.back()} hitSlop={8}>
-          <Ionicons name="chevron-back" size={24} color="#000" />
+          <Ionicons name="chevron-back" size={24} color={theme.foreground} />
         </Pressable>
-        <Text className="text-xl font-semibold">{t("profile.title")}</Text>
+        <Text className="text-xl font-semibold text-foreground">{t("profile.title")}</Text>
       </View>
 
       <View className="flex-1 items-center justify-center px-6">
-        <View className="w-24 h-24 rounded-full bg-amber-50 items-center justify-center mb-6">
-          <Ionicons name="person" size={40} color="#f59e0b" />
+        <View className="w-24 h-24 rounded-full bg-accent/10 items-center justify-center mb-6">
+          <Ionicons name="person" size={40} color={theme.accent} />
         </View>
-        <Text className="text-2xl font-bold text-gray-900">
+        <Text className="text-2xl font-bold text-foreground">
           {t("profile.greeting", { name: id })}
         </Text>
-        <Text className="text-base text-gray-500 mt-2">
+        <Text className="text-base text-muted mt-2">
           ID: {id}
         </Text>
       </View>
@@ -707,19 +760,21 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useThemeColors } from "@/src/theme";
 import { useContactForm } from "./index.hooks";
 
 export default function ContactScreen() {
   const { t } = useTranslation();
   const { form } = useContactForm();
+  const theme = useThemeColors();
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-background">
       <View className="flex-row items-center px-4 py-3 gap-3">
         <Pressable onPress={() => router.back()} hitSlop={8}>
-          <Ionicons name="chevron-back" size={24} color="#000" />
+          <Ionicons name="chevron-back" size={24} color={theme.foreground} />
         </Pressable>
-        <Text className="text-xl font-semibold">{t("contact.title")}</Text>
+        <Text className="text-xl font-semibold text-foreground">{t("contact.title")}</Text>
       </View>
 
       <ScrollView
@@ -799,10 +854,10 @@ export default function ContactScreen() {
         </View>
 
         <Pressable
-          className="bg-blue-500 rounded-xl py-4 items-center mt-8 active:bg-blue-600"
+          className="bg-primary rounded-xl py-4 items-center mt-8 active:opacity-80"
           onPress={() => form.handleSubmit()}
         >
-          <Text className="text-white text-base font-semibold">
+          <Text className="text-primary-foreground text-base font-semibold">
             {t("contact.submit")}
           </Text>
         </Pressable>
@@ -874,6 +929,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useThemeColors } from "@/src/theme";
 import { useAppDispatch, useAppSelector } from "@/src/redux-store/hooks";
 import { actions, selectors } from "@/src/redux-store/slices";
 
@@ -881,45 +937,46 @@ export default function CounterScreen() {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const count = useAppSelector(selectors.getCount);
+  const theme = useThemeColors();
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
+    <SafeAreaView className="flex-1 bg-background">
       <View className="flex-row items-center px-4 py-3 gap-3">
         <Pressable onPress={() => router.back()} hitSlop={8}>
-          <Ionicons name="chevron-back" size={24} color="#000" />
+          <Ionicons name="chevron-back" size={24} color={theme.foreground} />
         </Pressable>
-        <Text className="text-xl font-semibold">{t("counter.title")}</Text>
+        <Text className="text-xl font-semibold text-foreground">{t("counter.title")}</Text>
       </View>
 
       <View className="flex-1 items-center justify-center px-6">
-        <View className="w-32 h-32 rounded-full bg-blue-50 items-center justify-center mb-8">
-          <Text className="text-4xl font-bold text-blue-600">{count}</Text>
+        <View className="w-32 h-32 rounded-full bg-primary/10 items-center justify-center mb-8">
+          <Text className="text-4xl font-bold text-primary">{count}</Text>
         </View>
 
-        <Text className="text-lg text-gray-500 mb-10">
+        <Text className="text-lg text-muted mb-10">
           {t("counter.value", { count })}
         </Text>
 
         <View className="flex-row gap-4">
           <Pressable
-            className="w-14 h-14 rounded-2xl bg-red-50 items-center justify-center border border-red-100 active:bg-red-100"
+            className="w-14 h-14 rounded-2xl bg-destructive/10 items-center justify-center border border-destructive/20 active:opacity-70"
             onPress={() => dispatch(actions.decrement())}
           >
-            <Ionicons name="remove" size={22} color="#ef4444" />
+            <Ionicons name="remove" size={22} color={theme.destructive} />
           </Pressable>
 
           <Pressable
-            className="w-14 h-14 rounded-2xl bg-gray-50 items-center justify-center border border-gray-200 active:bg-gray-100"
+            className="w-14 h-14 rounded-2xl bg-card items-center justify-center border border-border active:opacity-70"
             onPress={() => dispatch(actions.reset())}
           >
-            <Ionicons name="refresh" size={20} color="#6b7280" />
+            <Ionicons name="refresh" size={20} color={theme.muted} />
           </Pressable>
 
           <Pressable
-            className="w-14 h-14 rounded-2xl bg-green-50 items-center justify-center border border-green-100 active:bg-green-100"
+            className="w-14 h-14 rounded-2xl bg-success/10 items-center justify-center border border-success/20 active:opacity-70"
             onPress={() => dispatch(actions.increment())}
           >
-            <Ionicons name="add" size={22} color="#22c55e" />
+            <Ionicons name="add" size={22} color={theme.success} />
           </Pressable>
         </View>
       </View>

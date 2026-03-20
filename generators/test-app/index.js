@@ -119,6 +119,7 @@ export default class TestAppGenerator extends Generator {
       const appJson = this.fs.readJSON(appJsonPath);
       appJson.expo = appJson.expo || {};
       appJson.expo.scheme = appJson.expo.scheme || appJson.expo.slug || "app";
+      appJson.expo.userInterfaceStyle = "automatic";
       appJson.expo.plugins = appJson.expo.plugins || [];
       if (!appJson.expo.plugins.includes("expo-router")) {
         appJson.expo.plugins.push("expo-router");
@@ -185,7 +186,7 @@ export default class TestAppGenerator extends Generator {
     // Copy all pkg-ui templates (non-dotfiles)
     this.fs.copy(path.join(sibling("pkg-ui"), "**"), this.destinationPath("."));
 
-    // global.css with theme CSS variables
+    // global.css with theme CSS variables (light defaults)
     this.fs.write(
       this.destinationPath("global.css"),
       `@tailwind base;
@@ -208,23 +209,56 @@ export default class TestAppGenerator extends Generator {
     --color-input: 249 250 251;
     --color-card: 249 250 251;
   }
-
-  .dark {
-    --color-primary: 59 130 246;
-    --color-primary-foreground: 255 255 255;
-    --color-secondary: 167 139 250;
-    --color-accent: 251 191 36;
-    --color-destructive: 248 113 113;
-    --color-success: 74 222 128;
-    --color-background: 15 23 42;
-    --color-foreground: 248 250 252;
-    --color-muted: 148 163 184;
-    --color-muted-foreground: 100 116 139;
-    --color-border: 30 41 59;
-    --color-input: 30 41 59;
-    --color-card: 30 41 59;
-  }
 }
+`,
+    );
+
+    // Override theme index to include vars export
+    this.fs.write(
+      this.destinationPath("src/theme/index.ts"),
+      `export { colors } from "./colors";
+export { useThemeColors } from "./useThemeColors";
+export { themeVars } from "./vars";
+`,
+    );
+
+    // NativeWind vars() for runtime dark mode switching
+    this.fs.write(
+      this.destinationPath("src/theme/vars.ts"),
+      `import { vars } from "nativewind";
+
+export const themeVars = {
+  light: vars({
+    "--color-primary": "37 99 235",
+    "--color-primary-foreground": "255 255 255",
+    "--color-secondary": "139 92 246",
+    "--color-accent": "245 158 11",
+    "--color-destructive": "239 68 68",
+    "--color-success": "34 197 94",
+    "--color-background": "255 255 255",
+    "--color-foreground": "17 24 39",
+    "--color-muted": "107 114 128",
+    "--color-muted-foreground": "156 163 175",
+    "--color-border": "229 231 235",
+    "--color-input": "249 250 251",
+    "--color-card": "249 250 251",
+  }),
+  dark: vars({
+    "--color-primary": "59 130 246",
+    "--color-primary-foreground": "255 255 255",
+    "--color-secondary": "167 139 250",
+    "--color-accent": "251 191 36",
+    "--color-destructive": "248 113 113",
+    "--color-success": "74 222 128",
+    "--color-background": "15 23 42",
+    "--color-foreground": "248 250 252",
+    "--color-muted": "148 163 184",
+    "--color-muted-foreground": "100 116 139",
+    "--color-border": "30 41 59",
+    "--color-input": "30 41 59",
+    "--color-card": "30 41 59",
+  }),
+};
 `,
     );
   }
@@ -428,11 +462,13 @@ export default class TestAppGenerator extends Generator {
     this.fs.write(
       this.destinationPath("app/_layout.tsx"),
       `import "../global.css";
+import { View } from "react-native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useColorScheme } from "nativewind";
 import { StoreProvider } from "@/src/redux-store/StoreProvider";
+import { themeVars } from "@/src/theme";
 import "@/src/i18n";
 
 export default function RootLayout() {
@@ -440,10 +476,12 @@ export default function RootLayout() {
 
   return (
     <StoreProvider>
-      <SafeAreaProvider>
-        <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-        <Stack screenOptions={{ headerShown: false }} />
-      </SafeAreaProvider>
+      <View style={themeVars[colorScheme ?? "light"]} className="flex-1">
+        <SafeAreaProvider>
+          <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+          <Stack screenOptions={{ headerShown: false }} />
+        </SafeAreaProvider>
+      </View>
     </StoreProvider>
   );
 }
@@ -598,7 +636,7 @@ function NavCard({
       this.destinationPath("app/(tabs)/settings.tsx"),
       `import { View, Text, Pressable, Switch, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useColorScheme } from "nativewind";
+import { colorScheme, useColorScheme } from "nativewind";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -606,9 +644,13 @@ import { useThemeColors } from "@/src/theme";
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
-  const { colorScheme, toggleColorScheme } = useColorScheme();
+  const { colorScheme: currentScheme } = useColorScheme();
   const [notifications, setNotifications] = useState(true);
   const theme = useThemeColors();
+
+  const toggleDarkMode = () => {
+    colorScheme.set(currentScheme === "dark" ? "light" : "dark");
+  };
 
   const toggleLanguage = () => {
     i18n.changeLanguage(i18n.language === "en" ? "it" : "en");
@@ -641,8 +683,8 @@ export default function SettingsScreen() {
             label={t("settings.darkMode")}
             right={
               <Switch
-                value={colorScheme === "dark"}
-                onValueChange={toggleColorScheme}
+                value={currentScheme === "dark"}
+                onValueChange={toggleDarkMode}
                 trackColor={{ false: theme.switchTrack, true: theme.switchTrackActive }}
                 thumbColor={Platform.OS === "android" ? theme.switchThumb : undefined}
                 ios_backgroundColor={theme.switchTrack}

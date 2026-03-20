@@ -12,10 +12,10 @@ export const <%= formName %> = ({}: <%= formName %>Props) => {
       {/* Example: <form.AppField name="name" children={(field) => <field.FormTextField placeholder="Name" />} /> */}
 
       <Pressable
-        className="bg-blue-500 py-3 px-6 rounded-lg items-center"
+        className="bg-primary py-3 px-6 rounded-lg items-center"
         onPress={() => form.handleSubmit()}
       >
-        <Text className="text-white text-base font-semibold">Submit</Text>
+        <Text className="text-primary-foreground text-base font-semibold">Submit</Text>
       </Pressable>
     </View>
   );

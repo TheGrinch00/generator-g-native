@@ -64,6 +64,7 @@ export default class PkgCoreGenerator extends Generator {
       const appJson = this.fs.readJSON(appJsonPath);
       appJson.expo = appJson.expo || {};
       appJson.expo.scheme = appJson.expo.scheme || appJson.expo.slug || "app";
+      appJson.expo.userInterfaceStyle = "automatic";
       appJson.expo.plugins = appJson.expo.plugins || [];
       if (!appJson.expo.plugins.includes("expo-router")) {
         appJson.expo.plugins.push("expo-router");

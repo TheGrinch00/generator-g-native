@@ -13,7 +13,7 @@ export default class CompGenerator extends Generator {
   initializing() {}
 
   async prompting() {
-    requirePackages(this, ["core"]);
+    requirePackages(this, ["core", "ui"]);
 
     this.log(
       yosay(

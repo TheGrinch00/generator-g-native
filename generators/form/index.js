@@ -10,7 +10,7 @@ const BASE_COMPONENTS_DIR = "src/components";
 
 export default class FormGenerator extends Generator {
   async prompting() {
-    requirePackages(this, ["core"]);
+    requirePackages(this, ["core", "ui"]);
 
     this.log(
       yosay(

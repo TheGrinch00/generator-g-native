@@ -102,9 +102,16 @@ export default class PkgCoreGenerator extends Generator {
     this.fs.write(
       this.destinationPath("app/_layout.tsx"),
       `import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function RootLayout() {
-  return <Stack />;
+  return (
+    <SafeAreaProvider>
+      <StatusBar style="dark" />
+      <Stack screenOptions={{ headerShown: false }} />
+    </SafeAreaProvider>
+  );
 }
 `,
     );
@@ -112,12 +119,20 @@ export default function RootLayout() {
     this.fs.write(
       this.destinationPath("app/index.tsx"),
       `import { View, Text } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Home</Text>
-    </View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+      <View style={{ flex: 1, paddingHorizontal: 24, paddingTop: 32 }}>
+        <Text style={{ fontSize: 30, fontWeight: "800", letterSpacing: -0.5, color: "#111" }}>
+          Home
+        </Text>
+        <Text style={{ fontSize: 16, color: "#6b7280", marginTop: 8 }}>
+          Welcome to your app.
+        </Text>
+      </View>
+    </SafeAreaView>
   );
 }
 `,

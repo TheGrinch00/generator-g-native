@@ -33,7 +33,7 @@ const help = `
 
   Subcommands (same as generator names):
     app, version, pkg-core, pkg-ui, pkg-redux, pkg-translations,
-    page, comp, form, model, slice
+    page, comp, form, model, slice, test-app
 
   Requires: yo and this package installed (e.g. npm i -g yo @thegrinch00/generator-g-native).
 `;

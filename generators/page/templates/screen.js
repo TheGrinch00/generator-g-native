@@ -1,24 +1,22 @@
-export default ({ ScreenName, screenTitle }) => `import { View, Text, StyleSheet } from "react-native";
+export default ({ ScreenName, screenTitle }) => `import { View, Text, Pressable } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
+import { ChevronLeft } from "lucide-react-native";
 
-const ${ScreenName}Screen = () => {
+export default function ${ScreenName}Screen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>${screenTitle}</Text>
-    </View>
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="flex-row items-center px-4 py-3 gap-3">
+        <Pressable onPress={() => router.back()} hitSlop={8}>
+          <ChevronLeft size={24} color="#000" />
+        </Pressable>
+        <Text className="text-xl font-semibold">${screenTitle}</Text>
+      </View>
+
+      <View className="flex-1 px-6">
+        {/* Screen content */}
+      </View>
+    </SafeAreaView>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-});
-
-export default ${ScreenName}Screen;
+}
 `;

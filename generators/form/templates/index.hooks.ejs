@@ -1,19 +1,19 @@
-import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
+import { useAppForm } from "@/components/_form";
 
 const schema = z.object({
   // name: z.string({ required_error: "Error message" })
 });
 
 export const use<%= formName %> = () => {
-  const form = useForm({
+  const form = useAppForm({
+    validators: {
+      onSubmit: schema,
+    },
     defaultValues: {
       // name: "",
     } as z.infer<typeof schema>,
     onSubmit: async ({ value }) => {},
-    validators: {
-      onSubmit: schema,
-    },
   });
 
   return {

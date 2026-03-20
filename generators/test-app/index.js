@@ -1,0 +1,952 @@
+import fs from "node:fs";
+import path from "node:path";
+import Generator from "yeoman-generator";
+import chalk from "chalk";
+import yosay from "yosay";
+import { extendConfigFile } from "../../common/index.js";
+
+export default class TestAppGenerator extends Generator {
+  async prompting() {
+    this.log(
+      yosay(
+        `Welcome to ${chalk.blue(
+          "GeNYG Native Test App",
+        )} generator! This will scaffold a ${chalk.red(
+          "full demo app",
+        )} with pages, forms, Redux, and translations.`,
+      ),
+    );
+
+    const { accept } = await this.prompt([
+      {
+        type: "confirm",
+        name: "accept",
+        message:
+          "This will run all pkg generators and create demo screens. Proceed?",
+        default: true,
+      },
+    ]);
+
+    if (!accept) {
+      this.abort = true;
+    }
+  }
+
+  async configuring() {
+    if (this.abort) return;
+
+    // Run all package generators in order
+    const generators = [
+      "@thegrinch00/g-native:pkg-core",
+      "@thegrinch00/g-native:pkg-ui",
+      "@thegrinch00/g-native:pkg-redux",
+      "@thegrinch00/g-native:pkg-translations",
+    ];
+
+    for (const gen of generators) {
+      this.log(chalk.cyan(`\n▸ Running ${gen}...\n`));
+      await this.composeWith(gen, { skipPrompts: true });
+    }
+  }
+
+  writing() {
+    if (this.abort) return;
+
+    this._writeTranslations();
+    this._writeRootLayout();
+    this._writeTabsLayout();
+    this._writeHomeScreen();
+    this._writeSettingsScreen();
+    this._writeProfileScreen();
+    this._writeContactFormScreen();
+    this._writeCounterScreen();
+    this._writeCounterSlice();
+    this._writeContactsSlice();
+    this._writeContactModel();
+  }
+
+  // ─── Translations ──────────────────────────────────────────
+
+  _writeTranslations() {
+    this.fs.writeJSON(this.destinationPath("src/i18n/locales/en.json"), {
+      common: {
+        loading: "Loading...",
+        error: "An error occurred",
+        retry: "Try again",
+        save: "Save",
+        cancel: "Cancel",
+        confirm: "Confirm",
+        delete: "Delete",
+        edit: "Edit",
+        back: "Back",
+      },
+      tabs: {
+        home: "Home",
+        settings: "Settings",
+      },
+      home: {
+        title: "Home",
+        subtitle: "Welcome to the demo app",
+        counterCard: "Counter Demo",
+        counterDescription: "Test Redux actions & selectors",
+        formCard: "Contact Form",
+        formDescription: "Test TanStack Form inputs",
+        profileCard: "Profile",
+        profileDescription: "Dynamic route example",
+      },
+      settings: {
+        title: "Settings",
+        language: "Language",
+        darkMode: "Dark Mode",
+        notifications: "Notifications",
+        notificationsDescription: "Receive push notifications",
+        version: "Version",
+      },
+      counter: {
+        title: "Counter",
+        value: "Value: {{count}}",
+        increment: "Increment",
+        decrement: "Decrement",
+        reset: "Reset",
+      },
+      contact: {
+        title: "New Contact",
+        firstName: "First Name",
+        firstNamePlaceholder: "Enter first name",
+        lastName: "Last Name",
+        lastNamePlaceholder: "Enter last name",
+        email: "Email",
+        emailPlaceholder: "name@example.com",
+        phone: "Phone",
+        phonePlaceholder: "+1 (555) 000-0000",
+        category: "Category",
+        newsletter: "Subscribe to newsletter",
+        newsletterDescription: "Receive updates via email",
+        submit: "Save Contact",
+        success: "Contact saved!",
+      },
+      profile: {
+        title: "Profile",
+        greeting: "Hello, {{name}}!",
+      },
+    });
+
+    this.fs.writeJSON(this.destinationPath("src/i18n/locales/it.json"), {
+      common: {
+        loading: "Caricamento...",
+        error: "Si è verificato un errore",
+        retry: "Riprova",
+        save: "Salva",
+        cancel: "Annulla",
+        confirm: "Conferma",
+        delete: "Elimina",
+        edit: "Modifica",
+        back: "Indietro",
+      },
+      tabs: {
+        home: "Home",
+        settings: "Impostazioni",
+      },
+      home: {
+        title: "Home",
+        subtitle: "Benvenuto nella demo app",
+        counterCard: "Demo Contatore",
+        counterDescription: "Testa azioni e selettori Redux",
+        formCard: "Form Contatto",
+        formDescription: "Testa gli input di TanStack Form",
+        profileCard: "Profilo",
+        profileDescription: "Esempio di rotta dinamica",
+      },
+      settings: {
+        title: "Impostazioni",
+        language: "Lingua",
+        darkMode: "Modalità Scura",
+        notifications: "Notifiche",
+        notificationsDescription: "Ricevi notifiche push",
+        version: "Versione",
+      },
+      counter: {
+        title: "Contatore",
+        value: "Valore: {{count}}",
+        increment: "Incrementa",
+        decrement: "Decrementa",
+        reset: "Resetta",
+      },
+      contact: {
+        title: "Nuovo Contatto",
+        firstName: "Nome",
+        firstNamePlaceholder: "Inserisci il nome",
+        lastName: "Cognome",
+        lastNamePlaceholder: "Inserisci il cognome",
+        email: "Email",
+        emailPlaceholder: "nome@esempio.com",
+        phone: "Telefono",
+        phonePlaceholder: "+39 333 000 0000",
+        category: "Categoria",
+        newsletter: "Iscriviti alla newsletter",
+        newsletterDescription: "Ricevi aggiornamenti via email",
+        submit: "Salva Contatto",
+        success: "Contatto salvato!",
+      },
+      profile: {
+        title: "Profilo",
+        greeting: "Ciao, {{name}}!",
+      },
+    });
+  }
+
+  // ─── Root Layout (wraps with StoreProvider + i18n) ─────────
+
+  _writeRootLayout() {
+    this.fs.write(
+      this.destinationPath("app/_layout.tsx"),
+      `import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { StoreProvider } from "@/src/redux-store/StoreProvider";
+import "@/src/i18n";
+
+export default function RootLayout() {
+  return (
+    <StoreProvider>
+      <SafeAreaProvider>
+        <StatusBar style="dark" />
+        <Stack screenOptions={{ headerShown: false }} />
+      </SafeAreaProvider>
+    </StoreProvider>
+  );
+}
+`,
+    );
+  }
+
+  // ─── Tabs Layout ───────────────────────────────────────────
+
+  _writeTabsLayout() {
+    this.fs.write(
+      this.destinationPath("app/(tabs)/_layout.tsx"),
+      `import { Tabs } from "expo-router";
+import { Home, Settings } from "lucide-react-native";
+import { useTranslation } from "react-i18next";
+
+export default function TabsLayout() {
+  const { t } = useTranslation();
+
+  return (
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: "#2563eb",
+        tabBarInactiveTintColor: "#9ca3af",
+        tabBarStyle: {
+          borderTopWidth: 0,
+          elevation: 0,
+          shadowOpacity: 0,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "600",
+        },
+      }}
+    >
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: t("tabs.home"),
+          tabBarIcon: ({ color, size }) => <Home size={size} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: t("tabs.settings"),
+          tabBarIcon: ({ color, size }) => (
+            <Settings size={size} color={color} />
+          ),
+        }}
+      />
+    </Tabs>
+  );
+}
+`,
+    );
+  }
+
+  // ─── Home Screen ───────────────────────────────────────────
+
+  _writeHomeScreen() {
+    this.fs.write(
+      this.destinationPath("app/(tabs)/index.tsx"),
+      `import { View, Text, Pressable, ScrollView } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
+import { Hash, Contact, User, ChevronRight } from "lucide-react-native";
+
+export default function HomeScreen() {
+  const { t } = useTranslation();
+
+  return (
+    <SafeAreaView className="flex-1 bg-white">
+      <ScrollView className="flex-1" contentContainerClassName="px-6 pt-8 pb-6">
+        <Text className="text-3xl font-bold tracking-tight text-gray-900">
+          {t("home.title")}
+        </Text>
+        <Text className="text-base text-gray-500 mt-1">
+          {t("home.subtitle")}
+        </Text>
+
+        <View className="mt-8 gap-3">
+          <NavCard
+            icon={<Hash size={22} color="#2563eb" />}
+            title={t("home.counterCard")}
+            description={t("home.counterDescription")}
+            onPress={() => router.push("/counter")}
+          />
+          <NavCard
+            icon={<Contact size={22} color="#8b5cf6" />}
+            title={t("home.formCard")}
+            description={t("home.formDescription")}
+            onPress={() => router.push("/contact")}
+          />
+          <NavCard
+            icon={<User size={22} color="#f59e0b" />}
+            title={t("home.profileCard")}
+            description={t("home.profileDescription")}
+            onPress={() => router.push("/profile/demo-user")}
+          />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+function NavCard({
+  icon,
+  title,
+  description,
+  onPress,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      className="flex-row items-center bg-gray-50 rounded-2xl p-4 border border-gray-100 active:bg-gray-100"
+      onPress={onPress}
+    >
+      <View className="w-11 h-11 rounded-xl bg-white items-center justify-center border border-gray-200">
+        {icon}
+      </View>
+      <View className="flex-1 ml-3">
+        <Text className="text-base font-semibold text-gray-900">{title}</Text>
+        <Text className="text-sm text-gray-500 mt-0.5">{description}</Text>
+      </View>
+      <ChevronRight size={20} color="#d1d5db" />
+    </Pressable>
+  );
+}
+`,
+    );
+  }
+
+  // ─── Settings Screen ───────────────────────────────────────
+
+  _writeSettingsScreen() {
+    this.fs.write(
+      this.destinationPath("app/(tabs)/settings.tsx"),
+      `import { View, Text, Pressable, Switch, Platform } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
+import { useState } from "react";
+import { Globe, Moon, Bell, Info } from "lucide-react-native";
+
+export default function SettingsScreen() {
+  const { t, i18n } = useTranslation();
+  const [darkMode, setDarkMode] = useState(false);
+  const [notifications, setNotifications] = useState(true);
+
+  const toggleLanguage = () => {
+    i18n.changeLanguage(i18n.language === "en" ? "it" : "en");
+  };
+
+  return (
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="flex-1 px-6 pt-8">
+        <Text className="text-3xl font-bold tracking-tight text-gray-900">
+          {t("settings.title")}
+        </Text>
+
+        <View className="mt-8 gap-1">
+          <SettingRow
+            icon={<Globe size={20} color="#2563eb" />}
+            label={t("settings.language")}
+            right={
+              <Pressable
+                onPress={toggleLanguage}
+                className="bg-blue-50 px-3 py-1.5 rounded-lg active:bg-blue-100"
+              >
+                <Text className="text-blue-600 font-semibold text-sm">
+                  {i18n.language.toUpperCase()}
+                </Text>
+              </Pressable>
+            }
+          />
+          <SettingRow
+            icon={<Moon size={20} color="#8b5cf6" />}
+            label={t("settings.darkMode")}
+            right={
+              <Switch
+                value={darkMode}
+                onValueChange={setDarkMode}
+                trackColor={{ false: "#e5e7eb", true: "#3b82f6" }}
+                thumbColor={Platform.OS === "android" ? "#fff" : undefined}
+              />
+            }
+          />
+          <SettingRow
+            icon={<Bell size={20} color="#f59e0b" />}
+            label={t("settings.notifications")}
+            description={t("settings.notificationsDescription")}
+            right={
+              <Switch
+                value={notifications}
+                onValueChange={setNotifications}
+                trackColor={{ false: "#e5e7eb", true: "#3b82f6" }}
+                thumbColor={Platform.OS === "android" ? "#fff" : undefined}
+              />
+            }
+          />
+          <SettingRow
+            icon={<Info size={20} color="#6b7280" />}
+            label={t("settings.version")}
+            right={
+              <Text className="text-sm text-gray-400">1.0.0</Text>
+            }
+          />
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+function SettingRow({
+  icon,
+  label,
+  description,
+  right,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  description?: string;
+  right: React.ReactNode;
+}) {
+  return (
+    <View className="flex-row items-center justify-between py-4 border-b border-gray-100">
+      <View className="flex-row items-center flex-1 mr-3">
+        {icon}
+        <View className="ml-3">
+          <Text className="text-base text-gray-900">{label}</Text>
+          {description && (
+            <Text className="text-xs text-gray-400 mt-0.5">{description}</Text>
+          )}
+        </View>
+      </View>
+      {right}
+    </View>
+  );
+}
+`,
+    );
+  }
+
+  // ─── Profile (dynamic route) ───────────────────────────────
+
+  _writeProfileScreen() {
+    this.fs.write(
+      this.destinationPath("app/profile/[id].tsx"),
+      `import { View, Text, Pressable } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { router, useLocalSearchParams } from "expo-router";
+import { useTranslation } from "react-i18next";
+import { ChevronLeft, User } from "lucide-react-native";
+
+export default function ProfileScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { t } = useTranslation();
+
+  return (
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="flex-row items-center px-4 py-3 gap-3">
+        <Pressable onPress={() => router.back()} hitSlop={8}>
+          <ChevronLeft size={24} color="#000" />
+        </Pressable>
+        <Text className="text-xl font-semibold">{t("profile.title")}</Text>
+      </View>
+
+      <View className="flex-1 items-center justify-center px-6">
+        <View className="w-24 h-24 rounded-full bg-amber-50 items-center justify-center mb-6">
+          <User size={40} color="#f59e0b" />
+        </View>
+        <Text className="text-2xl font-bold text-gray-900">
+          {t("profile.greeting", { name: id })}
+        </Text>
+        <Text className="text-base text-gray-500 mt-2">
+          ID: {id}
+        </Text>
+      </View>
+    </SafeAreaView>
+  );
+}
+`,
+    );
+  }
+
+  // ─── Contact Form Screen ──────────────────────────────────
+
+  _writeContactFormScreen() {
+    this.fs.write(
+      this.destinationPath("app/contact/index.tsx"),
+      `import { View, Text, Pressable, ScrollView, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
+import { ChevronLeft } from "lucide-react-native";
+import { useContactForm } from "./index.hooks";
+
+export default function ContactScreen() {
+  const { t } = useTranslation();
+  const { form } = useContactForm();
+
+  return (
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="flex-row items-center px-4 py-3 gap-3">
+        <Pressable onPress={() => router.back()} hitSlop={8}>
+          <ChevronLeft size={24} color="#000" />
+        </Pressable>
+        <Text className="text-xl font-semibold">{t("contact.title")}</Text>
+      </View>
+
+      <ScrollView
+        className="flex-1"
+        contentContainerClassName="px-6 pb-8"
+        keyboardShouldPersistTaps="handled"
+      >
+        <View className="gap-4 mt-4">
+          <form.AppField
+            name="firstName"
+            children={(field) => (
+              <field.FormTextField
+                label={t("contact.firstName")}
+                placeholder={t("contact.firstNamePlaceholder")}
+              />
+            )}
+          />
+
+          <form.AppField
+            name="lastName"
+            children={(field) => (
+              <field.FormTextField
+                label={t("contact.lastName")}
+                placeholder={t("contact.lastNamePlaceholder")}
+              />
+            )}
+          />
+
+          <form.AppField
+            name="email"
+            children={(field) => (
+              <field.FormTextField
+                label={t("contact.email")}
+                placeholder={t("contact.emailPlaceholder")}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            )}
+          />
+
+          <form.AppField
+            name="phone"
+            children={(field) => (
+              <field.FormTextField
+                label={t("contact.phone")}
+                placeholder={t("contact.phonePlaceholder")}
+                keyboardType="phone-pad"
+              />
+            )}
+          />
+
+          <form.AppField
+            name="category"
+            children={(field) => (
+              <field.FormSelect
+                label={t("contact.category")}
+                placeholder={t("contact.category")}
+                options={[
+                  { value: "personal", label: "Personal" },
+                  { value: "work", label: "Work" },
+                  { value: "family", label: "Family" },
+                  { value: "other", label: "Other" },
+                ]}
+              />
+            )}
+          />
+
+          <form.AppField
+            name="newsletter"
+            children={(field) => (
+              <field.FormSwitch
+                label={t("contact.newsletter")}
+                description={t("contact.newsletterDescription")}
+              />
+            )}
+          />
+        </View>
+
+        <Pressable
+          className="bg-blue-500 rounded-xl py-4 items-center mt-8 active:bg-blue-600"
+          onPress={() => form.handleSubmit()}
+        >
+          <Text className="text-white text-base font-semibold">
+            {t("contact.submit")}
+          </Text>
+        </Pressable>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+`,
+    );
+
+    this.fs.write(
+      this.destinationPath("app/contact/index.hooks.ts"),
+      `import { z } from "zod";
+import { Alert } from "react-native";
+import { useTranslation } from "react-i18next";
+import { useAppForm } from "@/src/components/_form";
+import { useAppDispatch } from "@/src/redux-store/hooks";
+import { actions } from "@/src/redux-store/slices";
+
+const schema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().optional(),
+  category: z.string().min(1, "Please select a category"),
+  newsletter: z.boolean(),
+});
+
+export const useContactForm = () => {
+  const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+
+  const form = useAppForm({
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      category: "",
+      newsletter: false,
+    } as z.infer<typeof schema>,
+    validators: {
+      onSubmit: schema,
+    },
+    onSubmit: async ({ value }) => {
+      dispatch(
+        actions.addContact({
+          id: Date.now().toString(),
+          ...value,
+        }),
+      );
+      Alert.alert(t("contact.success"));
+    },
+  });
+
+  return { form };
+};
+`,
+    );
+  }
+
+  // ─── Counter Screen (Redux demo) ──────────────────────────
+
+  _writeCounterScreen() {
+    this.fs.write(
+      this.destinationPath("app/counter/index.tsx"),
+      `import { View, Text, Pressable } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
+import { useTranslation } from "react-i18next";
+import { ChevronLeft, Plus, Minus, RotateCcw } from "lucide-react-native";
+import { useAppDispatch, useAppSelector } from "@/src/redux-store/hooks";
+import { actions, selectors } from "@/src/redux-store/slices";
+
+export default function CounterScreen() {
+  const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+  const count = useAppSelector(selectors.getCount);
+
+  return (
+    <SafeAreaView className="flex-1 bg-white">
+      <View className="flex-row items-center px-4 py-3 gap-3">
+        <Pressable onPress={() => router.back()} hitSlop={8}>
+          <ChevronLeft size={24} color="#000" />
+        </Pressable>
+        <Text className="text-xl font-semibold">{t("counter.title")}</Text>
+      </View>
+
+      <View className="flex-1 items-center justify-center px-6">
+        <View className="w-32 h-32 rounded-full bg-blue-50 items-center justify-center mb-8">
+          <Text className="text-4xl font-bold text-blue-600">{count}</Text>
+        </View>
+
+        <Text className="text-lg text-gray-500 mb-10">
+          {t("counter.value", { count })}
+        </Text>
+
+        <View className="flex-row gap-4">
+          <Pressable
+            className="w-14 h-14 rounded-2xl bg-red-50 items-center justify-center border border-red-100 active:bg-red-100"
+            onPress={() => dispatch(actions.decrement())}
+          >
+            <Minus size={22} color="#ef4444" />
+          </Pressable>
+
+          <Pressable
+            className="w-14 h-14 rounded-2xl bg-gray-50 items-center justify-center border border-gray-200 active:bg-gray-100"
+            onPress={() => dispatch(actions.reset())}
+          >
+            <RotateCcw size={20} color="#6b7280" />
+          </Pressable>
+
+          <Pressable
+            className="w-14 h-14 rounded-2xl bg-green-50 items-center justify-center border border-green-100 active:bg-green-100"
+            onPress={() => dispatch(actions.increment())}
+          >
+            <Plus size={22} color="#22c55e" />
+          </Pressable>
+        </View>
+      </View>
+    </SafeAreaView>
+  );
+}
+`,
+    );
+  }
+
+  // ─── Counter Slice ─────────────────────────────────────────
+
+  _writeCounterSlice() {
+    const sliceDir = "src/redux-store/slices/counter";
+
+    this.fs.write(
+      this.destinationPath(`${sliceDir}/index.ts`),
+      `import { createSlice } from "@reduxjs/toolkit";
+import * as selectors from "./counter.selectors";
+import * as sagas from "./counter.sagas";
+import { CounterState } from "./counter.interfaces";
+
+const initialState: CounterState = {
+  count: 0,
+};
+
+export const counterStore = createSlice({
+  name: "counter",
+  initialState,
+  reducers: {
+    increment: (state) => {
+      state.count += 1;
+    },
+    decrement: (state) => {
+      state.count -= 1;
+    },
+    reset: (state) => {
+      state.count = 0;
+    },
+  },
+});
+
+export { selectors, sagas };
+`,
+    );
+
+    this.fs.write(
+      this.destinationPath(`${sliceDir}/counter.interfaces.ts`),
+      `export interface CounterState {
+  count: number;
+}
+`,
+    );
+
+    this.fs.write(
+      this.destinationPath(`${sliceDir}/counter.selectors.ts`),
+      `import { RootState } from "@/src/redux-store";
+
+export const getCounter = (state: RootState) => state?.counter;
+export const getCount = (state: RootState) => state?.counter?.count ?? 0;
+`,
+    );
+
+    this.fs.write(
+      this.destinationPath(`${sliceDir}/counter.sagas.ts`),
+      `export function* onCounterChanged() {
+  // Example saga — react to counter changes
+}
+`,
+    );
+
+    // Update slices index to include counter
+    this.fs.write(
+      this.destinationPath("src/redux-store/slices/index.ts"),
+      `// Auto-generated by GeNYG Native
+import { combineReducers } from "@reduxjs/toolkit";
+
+import * as ui from "./ui";
+import * as counter from "./counter";
+import * as contacts from "./contacts";
+
+export const reducers = {
+  ui: ui.uiStore.reducer,
+  counter: counter.counterStore.reducer,
+  contacts: contacts.contactsStore.reducer,
+};
+
+export const actions = {
+  ...ui.uiStore.actions,
+  ...counter.counterStore.actions,
+  ...contacts.contactsStore.actions,
+};
+
+export const selectors = {
+  ...ui.selectors,
+  ...counter.selectors,
+  ...contacts.selectors,
+};
+
+export const sagas = [
+  ...Object.values(ui.sagas),
+  ...Object.values(counter.sagas),
+  ...Object.values(contacts.sagas),
+];
+`,
+    );
+  }
+
+  // ─── Contacts Slice ────────────────────────────────────────
+
+  _writeContactsSlice() {
+    const sliceDir = "src/redux-store/slices/contacts";
+
+    this.fs.write(
+      this.destinationPath(`${sliceDir}/index.ts`),
+      `import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import * as selectors from "./contacts.selectors";
+import * as sagas from "./contacts.sagas";
+import { ContactsState, Contact } from "./contacts.interfaces";
+
+const initialState: ContactsState = {
+  items: [],
+};
+
+export const contactsStore = createSlice({
+  name: "contacts",
+  initialState,
+  reducers: {
+    addContact: (state, action: PayloadAction<Contact>) => {
+      state.items.push(action.payload);
+    },
+    removeContact: (state, action: PayloadAction<string>) => {
+      state.items = state.items.filter((c) => c.id !== action.payload);
+    },
+    clearContacts: (state) => {
+      state.items = [];
+    },
+  },
+});
+
+export { selectors, sagas };
+`,
+    );
+
+    this.fs.write(
+      this.destinationPath(`${sliceDir}/contacts.interfaces.ts`),
+      `export interface Contact {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  category: string;
+  newsletter: boolean;
+}
+
+export interface ContactsState {
+  items: Contact[];
+}
+`,
+    );
+
+    this.fs.write(
+      this.destinationPath(`${sliceDir}/contacts.selectors.ts`),
+      `import { RootState } from "@/src/redux-store";
+
+export const getContacts = (state: RootState) => state?.contacts;
+export const getContactItems = (state: RootState) => state?.contacts?.items ?? [];
+export const getContactCount = (state: RootState) => state?.contacts?.items?.length ?? 0;
+`,
+    );
+
+    this.fs.write(
+      this.destinationPath(`${sliceDir}/contacts.sagas.ts`),
+      `export function* onContactAdded() {
+  // Example saga — react to contact additions
+}
+`,
+    );
+  }
+
+  // ─── Contact Model ────────────────────────────────────────
+
+  _writeContactModel() {
+    this.fs.write(
+      this.destinationPath("src/models/Contact/index.ts"),
+      `export interface IContact {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  category: string;
+  newsletter: boolean;
+}
+
+export class Contact implements IContact {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  category: string;
+  newsletter: boolean;
+
+  constructor(data: IContact) {
+    this.id = data.id;
+    this.firstName = data.firstName;
+    this.lastName = data.lastName;
+    this.email = data.email;
+    this.phone = data.phone;
+    this.category = data.category;
+    this.newsletter = data.newsletter;
+  }
+
+  get fullName(): string {
+    return \`\${this.firstName} \${this.lastName}\`;
+  }
+}
+`,
+    );
+  }
+}

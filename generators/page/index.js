@@ -37,7 +37,7 @@ function analyzeSegment(segment) {
 
 export default class PageGenerator extends Generator {
   async prompting() {
-    requirePackages(this, ["core"]);
+    requirePackages(this, ["core", "ui"]);
 
     this.log(
       yosay(

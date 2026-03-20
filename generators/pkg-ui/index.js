@@ -50,6 +50,8 @@ export default class PkgUiGenerator extends Generator {
     this.packageJson.merge({
       dependencies: {
         nativewind: "^4.1.0",
+        "@tanstack/react-form": "^1.11.0",
+        "lucide-react-native": "^0.511.0",
       },
       devDependencies: {
         tailwindcss: "^3.4.0",

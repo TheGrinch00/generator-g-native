@@ -80,7 +80,6 @@ export default class TestAppGenerator extends Generator {
         "react-dom",
         "@expo/metro-runtime",
         "@react-native-async-storage/async-storage",
-        "react-native-svg",
       ]);
     } catch (err) {
       this.log("\n❌ Dependencies installation failed:", err?.message || err);
@@ -176,10 +175,10 @@ export default class TestAppGenerator extends Generator {
       dependencies: {
         nativewind: "^4.1.0",
         "@tanstack/react-form": "^1.11.0",
-        "lucide-react-native": "^0.511.0",
       },
       devDependencies: {
         tailwindcss: "^3.4.0",
+        "babel-preset-expo": "^13.0.0",
       },
     });
 
@@ -418,7 +417,7 @@ export default function RootLayout() {
     this.fs.write(
       this.destinationPath("app/(tabs)/_layout.tsx"),
       `import { Tabs } from "expo-router";
-import { Home, Settings } from "lucide-react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 
 export default function TabsLayout() {
@@ -445,7 +444,7 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: t("tabs.home"),
-          tabBarIcon: ({ color, size }) => <Home size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -453,7 +452,7 @@ export default function TabsLayout() {
         options={{
           title: t("tabs.settings"),
           tabBarIcon: ({ color, size }) => (
-            <Settings size={size} color={color} />
+            <Ionicons name="settings" size={size} color={color} />
           ),
         }}
       />
@@ -473,7 +472,7 @@ export default function TabsLayout() {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Hash, Contact, User, ChevronRight } from "lucide-react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function HomeScreen() {
   const { t } = useTranslation();
@@ -490,19 +489,19 @@ export default function HomeScreen() {
 
         <View className="mt-8 gap-3">
           <NavCard
-            icon={<Hash size={22} color="#2563eb" />}
+            icon={<Ionicons name="keypad" size={22} color="#2563eb" />}
             title={t("home.counterCard")}
             description={t("home.counterDescription")}
             onPress={() => router.push("/counter")}
           />
           <NavCard
-            icon={<Contact size={22} color="#8b5cf6" />}
+            icon={<Ionicons name="mail" size={22} color="#8b5cf6" />}
             title={t("home.formCard")}
             description={t("home.formDescription")}
             onPress={() => router.push("/contact")}
           />
           <NavCard
-            icon={<User size={22} color="#f59e0b" />}
+            icon={<Ionicons name="person" size={22} color="#f59e0b" />}
             title={t("home.profileCard")}
             description={t("home.profileDescription")}
             onPress={() => router.push("/profile/demo-user")}
@@ -536,7 +535,7 @@ function NavCard({
         <Text className="text-base font-semibold text-gray-900">{title}</Text>
         <Text className="text-sm text-gray-500 mt-0.5">{description}</Text>
       </View>
-      <ChevronRight size={20} color="#d1d5db" />
+      <Ionicons name="chevron-forward" size={20} color="#d1d5db" />
     </Pressable>
   );
 }
@@ -553,7 +552,7 @@ function NavCard({
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import { Globe, Moon, Bell, Info } from "lucide-react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
@@ -573,7 +572,7 @@ export default function SettingsScreen() {
 
         <View className="mt-8 gap-1">
           <SettingRow
-            icon={<Globe size={20} color="#2563eb" />}
+            icon={<Ionicons name="globe" size={20} color="#2563eb" />}
             label={t("settings.language")}
             right={
               <Pressable
@@ -587,7 +586,7 @@ export default function SettingsScreen() {
             }
           />
           <SettingRow
-            icon={<Moon size={20} color="#8b5cf6" />}
+            icon={<Ionicons name="moon" size={20} color="#8b5cf6" />}
             label={t("settings.darkMode")}
             right={
               <Switch
@@ -595,11 +594,12 @@ export default function SettingsScreen() {
                 onValueChange={setDarkMode}
                 trackColor={{ false: "#e5e7eb", true: "#3b82f6" }}
                 thumbColor={Platform.OS === "android" ? "#fff" : undefined}
+                ios_backgroundColor="#e5e7eb"
               />
             }
           />
           <SettingRow
-            icon={<Bell size={20} color="#f59e0b" />}
+            icon={<Ionicons name="notifications" size={20} color="#f59e0b" />}
             label={t("settings.notifications")}
             description={t("settings.notificationsDescription")}
             right={
@@ -608,11 +608,12 @@ export default function SettingsScreen() {
                 onValueChange={setNotifications}
                 trackColor={{ false: "#e5e7eb", true: "#3b82f6" }}
                 thumbColor={Platform.OS === "android" ? "#fff" : undefined}
+                ios_backgroundColor="#e5e7eb"
               />
             }
           />
           <SettingRow
-            icon={<Info size={20} color="#6b7280" />}
+            icon={<Ionicons name="information-circle" size={20} color="#6b7280" />}
             label={t("settings.version")}
             right={
               <Text className="text-sm text-gray-400">1.0.0</Text>
@@ -663,7 +664,7 @@ function SettingRow({
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { ChevronLeft, User } from "lucide-react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function ProfileScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -673,14 +674,14 @@ export default function ProfileScreen() {
     <SafeAreaView className="flex-1 bg-white">
       <View className="flex-row items-center px-4 py-3 gap-3">
         <Pressable onPress={() => router.back()} hitSlop={8}>
-          <ChevronLeft size={24} color="#000" />
+          <Ionicons name="chevron-back" size={24} color="#000" />
         </Pressable>
         <Text className="text-xl font-semibold">{t("profile.title")}</Text>
       </View>
 
       <View className="flex-1 items-center justify-center px-6">
         <View className="w-24 h-24 rounded-full bg-amber-50 items-center justify-center mb-6">
-          <User size={40} color="#f59e0b" />
+          <Ionicons name="person" size={40} color="#f59e0b" />
         </View>
         <Text className="text-2xl font-bold text-gray-900">
           {t("profile.greeting", { name: id })}
@@ -705,7 +706,7 @@ export default function ProfileScreen() {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { ChevronLeft } from "lucide-react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useContactForm } from "./index.hooks";
 
 export default function ContactScreen() {
@@ -716,7 +717,7 @@ export default function ContactScreen() {
     <SafeAreaView className="flex-1 bg-white">
       <View className="flex-row items-center px-4 py-3 gap-3">
         <Pressable onPress={() => router.back()} hitSlop={8}>
-          <ChevronLeft size={24} color="#000" />
+          <Ionicons name="chevron-back" size={24} color="#000" />
         </Pressable>
         <Text className="text-xl font-semibold">{t("contact.title")}</Text>
       </View>
@@ -872,7 +873,7 @@ export const useContactForm = () => {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { ChevronLeft, Plus, Minus, RotateCcw } from "lucide-react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useAppDispatch, useAppSelector } from "@/src/redux-store/hooks";
 import { actions, selectors } from "@/src/redux-store/slices";
 
@@ -885,7 +886,7 @@ export default function CounterScreen() {
     <SafeAreaView className="flex-1 bg-white">
       <View className="flex-row items-center px-4 py-3 gap-3">
         <Pressable onPress={() => router.back()} hitSlop={8}>
-          <ChevronLeft size={24} color="#000" />
+          <Ionicons name="chevron-back" size={24} color="#000" />
         </Pressable>
         <Text className="text-xl font-semibold">{t("counter.title")}</Text>
       </View>
@@ -904,21 +905,21 @@ export default function CounterScreen() {
             className="w-14 h-14 rounded-2xl bg-red-50 items-center justify-center border border-red-100 active:bg-red-100"
             onPress={() => dispatch(actions.decrement())}
           >
-            <Minus size={22} color="#ef4444" />
+            <Ionicons name="remove" size={22} color="#ef4444" />
           </Pressable>
 
           <Pressable
             className="w-14 h-14 rounded-2xl bg-gray-50 items-center justify-center border border-gray-200 active:bg-gray-100"
             onPress={() => dispatch(actions.reset())}
           >
-            <RotateCcw size={20} color="#6b7280" />
+            <Ionicons name="refresh" size={20} color="#6b7280" />
           </Pressable>
 
           <Pressable
             className="w-14 h-14 rounded-2xl bg-green-50 items-center justify-center border border-green-100 active:bg-green-100"
             onPress={() => dispatch(actions.increment())}
           >
-            <Plus size={22} color="#22c55e" />
+            <Ionicons name="add" size={22} color="#22c55e" />
           </Pressable>
         </View>
       </View>

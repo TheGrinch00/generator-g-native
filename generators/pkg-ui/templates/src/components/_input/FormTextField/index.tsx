@@ -23,7 +23,7 @@ export const FormTextField = ({
         <Text className="text-sm font-medium text-gray-700">{label}</Text>
       )}
       <TextInput
-        className={`bg-gray-50 rounded-xl px-4 py-3.5 text-base text-gray-900 ${
+        className={`bg-gray-50 rounded-xl px-4 h-12 text-base text-gray-900 ${
           focused
             ? "border-2 border-blue-500"
             : hasError

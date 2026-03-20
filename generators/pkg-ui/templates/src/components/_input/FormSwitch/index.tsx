@@ -16,7 +16,7 @@ export const FormSwitch = ({
 
   return (
     <View className="gap-1">
-      <View className="flex-row items-center justify-between bg-gray-50 rounded-xl px-4 py-3.5 border border-gray-200">
+      <View className="flex-row items-center justify-between bg-gray-50 rounded-xl px-4 min-h-12 py-2 border border-gray-200">
         <View className="flex-1 mr-3">
           {label && (
             <Text className="text-base font-medium text-gray-900">
@@ -32,6 +32,7 @@ export const FormSwitch = ({
           onValueChange={(value) => field.handleChange(value)}
           trackColor={{ false: "#e5e7eb", true: "#3b82f6" }}
           thumbColor={Platform.OS === "android" ? "#fff" : undefined}
+          ios_backgroundColor="#e5e7eb"
           {...props}
         />
       </View>

@@ -6,7 +6,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { ChevronDown, Check } from "lucide-react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { useFieldContext } from "@/src/components/_form";
 import { FieldErrors } from "@/src/components/_form/FieldErrors";
 
@@ -35,7 +35,7 @@ export const FormSelect = ({ label, placeholder, options }: FormSelectProps) => 
       )}
 
       <Pressable
-        className={`flex-row items-center justify-between bg-gray-50 rounded-xl px-4 py-3.5 ${
+        className={`flex-row items-center justify-between bg-gray-50 rounded-xl px-4 h-12 ${
           hasError ? "border-2 border-red-400" : "border border-gray-200"
         }`}
         onPress={() => setVisible(true)}
@@ -49,7 +49,7 @@ export const FormSelect = ({ label, placeholder, options }: FormSelectProps) => 
         >
           {selectedOption?.label ?? placeholder ?? "Select..."}
         </Text>
-        <ChevronDown size={20} color="#9ca3af" />
+        <Ionicons name="chevron-down" size={20} color="#9ca3af" />
       </Pressable>
 
       <Modal visible={visible} transparent animationType="fade">
@@ -95,7 +95,7 @@ export const FormSelect = ({ label, placeholder, options }: FormSelectProps) => 
                     >
                       {item.label}
                     </Text>
-                    {isSelected && <Check size={20} color="#2563eb" />}
+                    {isSelected && <Ionicons name="checkmark" size={20} color="#2563eb" />}
                   </Pressable>
                 );
               }}

@@ -51,10 +51,10 @@ export default class PkgUiGenerator extends Generator {
       dependencies: {
         nativewind: "^4.1.0",
         "@tanstack/react-form": "^1.11.0",
-        "lucide-react-native": "^0.511.0",
       },
       devDependencies: {
         tailwindcss: "^3.4.0",
+        "babel-preset-expo": "^13.0.0",
       },
     });
 
@@ -104,7 +104,7 @@ export default class PkgUiGenerator extends Generator {
       });
 
     try {
-      await run("npx", ["expo", "install", "react-native-reanimated", "react-native-worklets", "react-native-svg"]);
+      await run("npx", ["expo", "install", "react-native-reanimated", "react-native-worklets"]);
     } catch (err) {
       this.log("\n❌ Dependencies installation failed:", err?.message || err);
       throw err;

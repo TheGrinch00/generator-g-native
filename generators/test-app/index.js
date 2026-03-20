@@ -80,6 +80,8 @@ export default class TestAppGenerator extends Generator {
         "react-dom",
         "@expo/metro-runtime",
         "@react-native-async-storage/async-storage",
+        "@expo/vector-icons",
+        "@shopify/flash-list",
       ]);
     } catch (err) {
       this.log("\n❌ Dependencies installation failed:", err?.message || err);

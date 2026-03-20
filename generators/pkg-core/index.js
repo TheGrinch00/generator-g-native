@@ -190,6 +190,8 @@ export default function HomeScreen() {
         "react-native-gesture-handler",
         "react-dom",
         "@expo/metro-runtime",
+        "@expo/vector-icons",
+        "@shopify/flash-list",
       ]);
     } catch (err) {
       this.log("\n❌ Dependencies installation failed:", err?.message || err);

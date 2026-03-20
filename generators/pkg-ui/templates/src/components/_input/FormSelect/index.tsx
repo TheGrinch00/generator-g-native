@@ -1,11 +1,6 @@
 import { useState } from "react";
-import {
-  FlatList,
-  Modal,
-  Pressable,
-  Text,
-  View,
-} from "react-native";
+import { Modal, Pressable, Text, View } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useFieldContext } from "@/src/components/_form";
 import { FieldErrors } from "@/src/components/_form/FieldErrors";
@@ -73,9 +68,10 @@ export const FormSelect = ({ label, placeholder, options }: FormSelectProps) => 
               </Text>
             </View>
 
-            <FlatList
+            <FlashList
               data={options}
               keyExtractor={(item) => String(item.value)}
+              estimatedItemSize={56}
               renderItem={({ item }) => {
                 const isSelected = item.value === field.state.value;
                 return (
@@ -105,7 +101,6 @@ export const FormSelect = ({ label, placeholder, options }: FormSelectProps) => 
                 <View className="h-px bg-border/50 mx-5" />
               )}
             />
-
             <View className="h-8" />
           </Pressable>
         </Pressable>

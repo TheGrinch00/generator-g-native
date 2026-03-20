@@ -136,9 +136,25 @@ export default class PageGenerator extends Generator {
       segFolder,
     );
 
-    // Screen UI
+    // Compute the screens dir (mirrors app/ structure but under src/screens/)
+    // Strip group prefixes like (tabs) and dynamic brackets like [id]
+    const screensDir = path.posix.join(
+      "src/screens",
+      parentRel ? parentRel.replace(/\(([^)]+)\)/g, "$1") : "",
+      segFolder.replace(/[\[\]\.]/g, ""),
+    );
+    const screenComponent = `${ScreenName}Screen`;
+    const screenImport = `@/${screensDir}/${screenComponent}`;
+
+    // Thin re-export in app/ (Expo Router route file)
     this.fs.write(
       this.destinationPath(path.posix.join(routeDir, "index.tsx")),
+      `export { default } from "${screenImport}";\n`,
+    );
+
+    // Full screen UI in src/screens/
+    this.fs.write(
+      this.destinationPath(path.posix.join(screensDir, `${screenComponent}.tsx`)),
       isDynamic
         ? screenDynamicTpl({ ScreenName, screenTitle, paramType, paramId })
         : screenTpl({ ScreenName, screenTitle }),
@@ -146,7 +162,7 @@ export default class PageGenerator extends Generator {
 
     // Screen hooks (business logic)
     this.fs.write(
-      this.destinationPath(path.posix.join(routeDir, "index.hooks.tsx")),
+      this.destinationPath(path.posix.join(screensDir, "index.hooks.tsx")),
       isDynamic
         ? screenDynamicHooksTpl({ ScreenName, paramType, paramId })
         : screenHooksTpl({ ScreenName }),

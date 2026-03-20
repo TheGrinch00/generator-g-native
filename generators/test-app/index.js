@@ -522,11 +522,12 @@ export default function RootLayout() {
   // ─── Tabs Layout ──────────────────────────────────────────
 
   _writeTabsLayout() {
+    // Tabs layout stays in app/ (it configures navigation, not a screen)
     this.fs.write(
       this.destinationPath("app/(tabs)/_layout.tsx"),
       `import { Tabs } from "expo-router";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useTabsLayout } from "./_layout.hooks";
+import { useTabsLayout } from "@/src/screens/tabs/_layout.hooks";
 
 export default function TabsLayout() {
   const { t, theme } = useTabsLayout();
@@ -573,7 +574,7 @@ export default function TabsLayout() {
     );
 
     this.fs.write(
-      this.destinationPath("app/(tabs)/_layout.hooks.tsx"),
+      this.destinationPath("src/screens/tabs/_layout.hooks.tsx"),
       `import { useTranslation } from "react-i18next";
 import { useThemeColors } from "@/src/theme";
 
@@ -590,8 +591,16 @@ export const useTabsLayout = () => {
   // ─── Home Screen ──────────────────────────────────────────
 
   _writeHomeScreen() {
+    // Thin re-export in app/
     this.fs.write(
       this.destinationPath("app/(tabs)/index.tsx"),
+      `export { default } from "@/src/screens/tabs/HomeScreen";
+`,
+    );
+
+    // Full UI in src/screens/
+    this.fs.write(
+      this.destinationPath("src/screens/tabs/HomeScreen.tsx"),
       `import { View, Text, Pressable, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -678,7 +687,7 @@ function NavCard({
     );
 
     this.fs.write(
-      this.destinationPath("app/(tabs)/index.hooks.tsx"),
+      this.destinationPath("src/screens/tabs/index.hooks.tsx"),
       `import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useThemeColors } from "@/src/theme";
@@ -702,6 +711,12 @@ export const useHomeScreen = () => {
   _writeSettingsScreen() {
     this.fs.write(
       this.destinationPath("app/(tabs)/settings.tsx"),
+      `export { default } from "@/src/screens/tabs/SettingsScreen";
+`,
+    );
+
+    this.fs.write(
+      this.destinationPath("src/screens/tabs/SettingsScreen.tsx"),
       `import { View, Text, Pressable, Switch, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -811,7 +826,7 @@ function SettingRow({
     );
 
     this.fs.write(
-      this.destinationPath("app/(tabs)/settings.hooks.tsx"),
+      this.destinationPath("src/screens/tabs/settings.hooks.tsx"),
       `import { useState } from "react";
 import { colorScheme, useColorScheme } from "nativewind";
 import { useTranslation } from "react-i18next";
@@ -855,6 +870,12 @@ export const useSettingsScreen = () => {
   _writeProfileScreen() {
     this.fs.write(
       this.destinationPath("app/profile/[id]/index.tsx"),
+      `export { default } from "@/src/screens/profile/ProfileScreen";
+`,
+    );
+
+    this.fs.write(
+      this.destinationPath("src/screens/profile/ProfileScreen.tsx"),
       `import { View, Text, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
@@ -891,7 +912,7 @@ export default function ProfileScreen() {
     );
 
     this.fs.write(
-      this.destinationPath("app/profile/[id]/index.hooks.tsx"),
+      this.destinationPath("src/screens/profile/index.hooks.tsx"),
       `import { useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useThemeColors } from "@/src/theme";
@@ -912,6 +933,12 @@ export const useProfileScreen = () => {
   _writeContactFormScreen() {
     this.fs.write(
       this.destinationPath("app/contact/index.tsx"),
+      `export { default } from "@/src/screens/contact/ContactScreen";
+`,
+    );
+
+    this.fs.write(
+      this.destinationPath("src/screens/contact/ContactScreen.tsx"),
       `import { View, Text, Pressable, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
@@ -1022,7 +1049,7 @@ export default function ContactScreen() {
     );
 
     this.fs.write(
-      this.destinationPath("app/contact/index.hooks.tsx"),
+      this.destinationPath("src/screens/contact/index.hooks.tsx"),
       `import { z } from "zod";
 import { Alert } from "react-native";
 import { useTranslation } from "react-i18next";
@@ -1079,6 +1106,12 @@ export const useContactScreen = () => {
   _writeCounterScreen() {
     this.fs.write(
       this.destinationPath("app/counter/index.tsx"),
+      `export { default } from "@/src/screens/counter/CounterScreen";
+`,
+    );
+
+    this.fs.write(
+      this.destinationPath("src/screens/counter/CounterScreen.tsx"),
       `import { View, Text, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
@@ -1136,7 +1169,7 @@ export default function CounterScreen() {
     );
 
     this.fs.write(
-      this.destinationPath("app/counter/index.hooks.tsx"),
+      this.destinationPath("src/screens/counter/index.hooks.tsx"),
       `import { useTranslation } from "react-i18next";
 import { useThemeColors } from "@/src/theme";
 import { useAppDispatch, useAppSelector } from "@/src/redux-store/hooks";
@@ -1467,6 +1500,12 @@ export default apiActionBuilder<
   _writePostsScreen() {
     this.fs.write(
       this.destinationPath("app/posts/index.tsx"),
+      `export { default } from "@/src/screens/posts/PostsScreen";
+`,
+    );
+
+    this.fs.write(
+      this.destinationPath("src/screens/posts/PostsScreen.tsx"),
       `import { View, Text, Pressable, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
@@ -1535,7 +1574,7 @@ export default function PostsScreen() {
     );
 
     this.fs.write(
-      this.destinationPath("app/posts/index.hooks.tsx"),
+      this.destinationPath("src/screens/posts/index.hooks.tsx"),
       `import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useThemeColors } from "@/src/theme";

@@ -1,6 +1,6 @@
 {
   "name": "@thegrinch00/generator-g-native",
-  "version": "0.9.11",
+  "version": "0.9.12",
   "description": "React Native Expo Yeoman Generator",
   "main": "index.js",
   "bin": {

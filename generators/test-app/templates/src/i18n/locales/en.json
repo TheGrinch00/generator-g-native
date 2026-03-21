@@ -55,7 +55,13 @@
     "newsletter": "Subscribe to newsletter",
     "newsletterDescription": "Receive updates via email",
     "submit": "Save Contact",
-    "success": "Contact saved!"
+    "success": "Contact saved!",
+    "validation": {
+      "firstNameRequired": "First name is required",
+      "lastNameRequired": "Last name is required",
+      "emailInvalid": "Invalid email address",
+      "categoryRequired": "Please select a category"
+    }
   },
   "profile": {
     "title": "Profile",

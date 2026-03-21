@@ -55,7 +55,13 @@
     "newsletter": "Iscriviti alla newsletter",
     "newsletterDescription": "Ricevi aggiornamenti via email",
     "submit": "Salva Contatto",
-    "success": "Contatto salvato!"
+    "success": "Contatto salvato!",
+    "validation": {
+      "firstNameRequired": "Il nome è obbligatorio",
+      "lastNameRequired": "Il cognome è obbligatorio",
+      "emailInvalid": "Indirizzo email non valido",
+      "categoryRequired": "Seleziona una categoria"
+    }
   },
   "profile": {
     "title": "Profilo",
